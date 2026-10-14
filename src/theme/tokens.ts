@@ -28,6 +28,7 @@ export const colorTokens = {
   "brand-forest-alpha-6": alpha("brand-forest", 6),
   "brand-forest-alpha-8": alpha("brand-forest", 8),
   "brand-forest-alpha-10": alpha("brand-forest", 10),
+  "brand-forest-border": `color-mix(in srgb, ${ref("brand-forest")} 30%, ${ref("white")})`, // badge outline
 
   // ── Brand: Gold (reserved for the Print action) ──────
   "brand-gold": "#C4965A",
