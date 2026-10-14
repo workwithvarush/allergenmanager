@@ -1,0 +1,104 @@
+/* ───────────────────────────────────────────────────────────────
+   EMCC Allergen Manager — Foundational Tokens
+   Spacing, radii, borders, shadows, motion and type classes.
+   Extracted from the Nottingham Venues / EMCC design spec.
+   Source: reference/source-spec.html
+   ─────────────────────────────────────────────────────────────── */
+
+
+:root {
+  /* Colour and typography tokens (brand, neutral, semantic, allergen, tag,
+     fg/bg aliases, font families, sizes, weights) are defined in
+     src/theme/tokens.ts and emitted by <ThemeStyle /> in app/layout.tsx. */
+
+  /* ── Spacing scale (4px base) ───────────────────────── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ── Radii ──────────────────────────────────────────── */
+  --radius-sm:   4px;   /* allergen cells, tags */
+  --radius-md:   6px;   /* buttons, inputs */
+  --radius-lg:   8px;   /* small cards, doc rows */
+  --radius-xl:  12px;   /* cards, panels, app shell */
+  --radius-pill: 999px; /* tag toggles, pills */
+
+  /* ── Borders ────────────────────────────────────────── */
+  --border-default: 1px solid var(--neutral-200);
+  --border-strong:  1px solid var(--neutral-300);
+  --border-focus:   2px solid var(--brand-forest);
+  --border-brand:   1px solid var(--brand-forest);
+
+  /* ── Elevation ──────────────────────────────────────── */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.10);
+
+  /* ── Motion ─────────────────────────────────────────── */
+  --transition-fast: 100ms ease; /* @kind other */
+  --transition-base: 150ms ease; /* @kind other */
+  --transition-slow: 300ms ease; /* @kind other */
+}
+
+/* ───────────────────────────────────────────────────────────────
+   Semantic type styles — apply as .t-* classes OR copy props
+   ─────────────────────────────────────────────────────────────── */
+
+.t-display {
+  font-family: var(--font-sans);
+  font-size: var(--text-3xl); font-weight: var(--fw-semibold);
+  letter-spacing: -0.5px; line-height: 1.1; color: var(--fg-1);
+}
+.t-h1 {
+  font-family: var(--font-sans);
+  font-size: var(--text-2xl); font-weight: var(--fw-semibold);
+  letter-spacing: -0.3px; line-height: 1.15; color: var(--fg-1);
+}
+.t-h2 {
+  font-family: var(--font-sans);
+  font-size: var(--text-xl); font-weight: var(--fw-semibold);
+  letter-spacing: -0.2px; line-height: 1.2; color: var(--fg-1);
+}
+.t-h3 {
+  font-family: var(--font-sans);
+  font-size: var(--text-lg); font-weight: var(--fw-semibold);
+  line-height: 1.3; color: var(--fg-1);
+}
+.t-body {
+  font-family: var(--font-sans);
+  font-size: var(--text-base); font-weight: var(--fw-regular);
+  line-height: 1.5; color: var(--fg-2);
+}
+.t-body-medium {
+  font-family: var(--font-sans);
+  font-size: var(--text-base); font-weight: var(--fw-medium);
+  line-height: 1.5; color: var(--fg-2);
+}
+.t-small {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm); font-weight: var(--fw-regular);
+  line-height: 1.5; color: var(--fg-3);
+}
+.t-caption {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs); font-weight: var(--fw-medium);
+  letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--fg-5);
+}
+.t-mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs); font-weight: var(--fw-regular);
+  color: var(--fg-4);
+}
+.t-allergen {
+  font-family: var(--font-sans);
+  font-size: 10px; font-weight: var(--fw-medium);
+  letter-spacing: 0.02em; line-height: 1.3;
+}

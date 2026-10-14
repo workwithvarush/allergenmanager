@@ -1,69 +1,34 @@
-import Image from "next/image";
-import styles from "./page.module.css";
-
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>
-            To get started, edit the{" "}
-            <code className={styles.code}>page.tsx</code> file.
-          </h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <main className="app-shell">
+      <div className="screen">
+        <div className="screen-header">
+          <div>
+            <h1 className="screen-title">Allergen Manager</h1>
+            <p className="screen-sub">
+              Design system loaded. The click-through reference lives in
+              /prototype.
+            </p>
+          </div>
+        </div>
+        <div className="card">
+          <p className="t-body">
+            Tokens, UI kit and prototype styles come from
+            src/styles/design-system.
+          </p>
+          <p className="t-mono">v1 · 14 Oct · 12:00</p>
+          <p style={{ display: "flex", gap: 8, marginTop: 16 }}>
+            <span className="badge badge-ready">Ready</span>
+            <span className="badge badge-warn">Reprint required</span>
+            <span className="badge badge-danger">Incomplete</span>
+          </p>
+          <p style={{ display: "flex", gap: 8, marginTop: 16 }}>
+            <button className="btn btn-primary">Fill allergens</button>
+            <button className="btn btn-secondary">Back to dashboard</button>
+            <button className="btn btn-gold">Print all 3 documents</button>
           </p>
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }
