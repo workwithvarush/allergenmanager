@@ -13,8 +13,8 @@ type DialogProps = {
   subtitle?: ReactNode;
   /** Buttons along the bottom, right-aligned. */
   footer?: ReactNode;
-  /** "sm" (480px) suits short forms like login; "md" (640px) suits New event. */
-  size?: "sm" | "md";
+  /** "xs" (380px) for login, "sm" (480px) for short forms, "md" (640px) for New event. */
+  size?: "xs" | "sm" | "md";
   children?: ReactNode;
 };
 
@@ -22,6 +22,8 @@ type DialogProps = {
  * Modal pop-up on the native <dialog> element, which supplies the backdrop,
  * Esc handling, focus trapping and focus return. Controlled: the parent owns
  * `open` and decides what happens in `onClose`.
+ *
+ * Focus starts on the first element marked `data-autofocus`, else on ✕.
  */
 export function Dialog({ open, onClose, title, eyebrow, subtitle, footer, size = "sm", children }: DialogProps) {
   const ref = useRef<HTMLDialogElement>(null);
@@ -30,14 +32,22 @@ export function Dialog({ open, onClose, title, eyebrow, subtitle, footer, size =
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
+    if (open && !dialog.open) {
+      dialog.showModal();
+      dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus();
+    }
     if (!open && dialog.open) dialog.close();
+    // Close when unmounted or hidden (Next keeps visited routes in a hidden <Activity>):
+    // a modal left open off-screen would make the rest of the page inert.
+    return () => {
+      if (dialog.open) dialog.close();
+    };
   }, [open]);
 
   return (
     <dialog
       ref={ref}
-      className={size === "md" ? "dialog dialog-md" : "dialog"}
+      className={size === "sm" ? "dialog" : `dialog dialog-${size}`}
       aria-labelledby={titleId}
       onCancel={(event) => {
         // Esc: leave closing to the parent so `open` stays the source of truth.

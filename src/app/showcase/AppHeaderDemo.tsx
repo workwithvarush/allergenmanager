@@ -4,7 +4,7 @@ import { useState } from "react";
 import { AppHeader } from "@/components/AppHeader";
 
 const NAV = [
-  { href: "/", label: "Dashboard" },
+  { href: "/showcase", label: "Dashboard" }, // points at this page so the current-tab style shows
   { href: "/change-log", label: "Change log" },
   { href: "/archive", label: "Archive" },
 ];
@@ -14,14 +14,14 @@ export function AppHeaderDemo() {
   return (
     <div className="app-frame">
       <AppHeader
-        title="Allergen manager · EMCC"
+        venueName="EMCC"
         nav={NAV}
         user={{ name: "Jamie Baker", role: "Chef" }}
         onLogOut={() => setLoggedOut(true)}
       />
       {loggedOut && (
         <p className="t-small" role="status" style={{ padding: "8px 24px", margin: 0 }}>
-          Log out clicked.
+          Logged out (confirmed).
         </p>
       )}
     </div>

@@ -1,0 +1,80 @@
+/* Dashboard screen — values from the prototype */
+
+.screen {
+  padding: 24px 28px 32px;
+}
+
+.header {
+  margin-bottom: 20px;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--text-2xl);
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.3px;
+  line-height: 1.15;
+  color: var(--fg-1);
+}
+
+.sub {
+  margin: 4px 0 0;
+  font-size: var(--text-sm);
+  color: var(--fg-4);
+}
+
+/* Stat tiles */
+
+.statSection {
+  margin-bottom: 20px;
+}
+
+.statHeading {
+  margin: 0 0 8px;
+  font-size: 10px;
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--fg-4);
+}
+
+.statRows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.stats4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.stats3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 640px) {
+  .stats4,
+  .stats3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Event list beside the selected event */
+
+.grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+@media (max-width: 960px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

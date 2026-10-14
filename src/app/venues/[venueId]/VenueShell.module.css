@@ -1,0 +1,37 @@
+/* App shell from the prototype: a centred white frame holding the header and the page */
+
+.shell {
+  /* body is a flex column (prototype.css); without this, auto margins shrink the shell to its content */
+  width: 100%;
+  max-width: 1280px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 20px 24px 32px;
+  display: flex;
+  flex-direction: column;
+}
+
+.frame {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border: var(--border-default);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.content {
+  flex: 1;
+  min-height: 0;
+}
+
+.offline {
+  padding: 16px 28px 0;
+}
+
+/* Collapse the gap while the offline banner has nothing to show (its live region stays mounted) */
+.offline:not(:has(:global(.banner))) {
+  padding: 0;
+}

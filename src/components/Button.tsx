@@ -1,9 +1,13 @@
 import type { ComponentProps } from "react";
 
-export type ButtonVariant = "primary" | "secondary";
+/**
+ * primary: the forest action — at most one per screen.
+ * gold: reserved for the Print action.
+ * danger: destructive confirmations, e.g. "Replace dish list".
+ */
+export type ButtonVariant = "primary" | "secondary" | "gold" | "danger";
 
 type ButtonProps = ComponentProps<"button"> & {
-  /** "primary" is the forest action; use at most one per screen. */
   variant?: ButtonVariant;
 };
 

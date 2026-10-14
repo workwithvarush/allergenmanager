@@ -5,13 +5,15 @@ type ProgressBarProps = {
   max: number;
   /** Shown above the bar and used as its accessible name, e.g. "3 of 8 dishes completed". */
   label: ReactNode;
+  /** Replaces the percentage on the right, e.g. a version stamp "v6 · edited 09:00". */
+  detail?: ReactNode;
 };
 
 /**
  * Labelled progress bar (`.progress-*` in kit.css). Turns green when
  * `value` reaches `max`.
  */
-export function ProgressBar({ value, max, label }: ProgressBarProps) {
+export function ProgressBar({ value, max, label, detail }: ProgressBarProps) {
   const labelId = useId();
   const clamped = Math.min(Math.max(value, 0), max);
   const complete = max > 0 && clamped >= max;
@@ -25,9 +27,13 @@ export function ProgressBar({ value, max, label }: ProgressBarProps) {
         <span id={labelId} className="progress-label">
           {label}
         </span>
-        <span className="progress-value" aria-hidden="true">
-          {percent}%
-        </span>
+        {detail !== undefined ? (
+          <span className="progress-value progress-detail">{detail}</span>
+        ) : (
+          <span className="progress-value" aria-hidden="true">
+            {percent}%
+          </span>
+        )}
       </div>
       <div
         className="progress-track"

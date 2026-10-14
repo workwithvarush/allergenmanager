@@ -5,14 +5,14 @@ type StatTileProps = {
   value: ReactNode;
   /** Short caption under the figure, e.g. "Events"; shown in caps. */
   label: string;
-  /** "brand" highlights the tile in forest, as for Pending review. */
-  tone?: "default" | "brand";
+  /** "brand": filled forest highlight (Pending review). "outline": white with a forest border (cross-venue totals). */
+  tone?: "default" | "brand" | "outline";
 };
 
 /** Dashboard summary tile (`.stat-card` in kit.css). */
 export function StatTile({ value, label, tone = "default" }: StatTileProps) {
   return (
-    <div className={tone === "brand" ? "stat-card stat-card-brand" : "stat-card"}>
+    <div className={tone === "default" ? "stat-card" : `stat-card stat-card-${tone}`}>
       <div className="stat-card-num">{value}</div>
       <div className="stat-card-label">{label}</div>
     </div>

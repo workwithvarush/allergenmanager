@@ -1,0 +1,123 @@
+/* Venue picker — values from the prototype's venue-select screen */
+
+.page {
+  /* body is a flex column (prototype.css); without this, auto margins shrink the page to its content */
+  width: 100%;
+  max-width: 1280px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 20px 24px 32px;
+  display: flex;
+  flex-direction: column;
+}
+
+.centre {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.column {
+  width: 100%;
+  max-width: 440px;
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 36px;
+}
+
+.product {
+  font-size: var(--text-xs);
+  font-weight: var(--fw-medium);
+  color: var(--fg-3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0 0 6px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.3px;
+  color: var(--fg-1);
+}
+
+.subtitle {
+  margin: 0 0 28px;
+  text-align: center;
+  font-size: var(--text-base);
+  color: var(--fg-4);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  background: var(--white);
+  border: var(--border-default);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+.card:hover {
+  border-color: var(--neutral-400);
+  box-shadow: var(--shadow-md);
+}
+
+.card:focus-visible {
+  outline: none;
+  border-color: var(--brand-forest);
+  box-shadow: 0 0 0 3px var(--brand-forest-alpha-10);
+}
+
+.card:disabled {
+  cursor: default;
+  opacity: 0.6;
+  box-shadow: var(--shadow-sm);
+  border-color: var(--neutral-200);
+}
+
+.name {
+  display: block;
+  font-size: var(--text-md);
+  font-weight: var(--fw-semibold);
+  color: var(--fg-1);
+}
+
+.meta {
+  display: block;
+  margin-top: 2px;
+  font-size: var(--text-sm);
+  color: var(--fg-4);
+}
+
+.footer {
+  padding: 14px 0 4px;
+  text-align: center;
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+  color: var(--fg-4);
+}
