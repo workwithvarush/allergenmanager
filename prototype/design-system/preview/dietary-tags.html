@@ -1,0 +1,68 @@
+<!doctype html>
+<!-- @dsCard group="Components" name="Dietary tags · display + toggle" subtitle="Print tag chips and entry-screen toggles" viewport="700x180" -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Dietary tags · display + toggle</title>
+<link rel="stylesheet" href="_card.css">
+<style>
+.btn { display:inline-flex; align-items:center; gap:6px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500; padding:7px 16px; border-radius:6px; border:1px solid transparent; cursor:pointer; line-height:1.4; white-space:nowrap; transition: background 150ms ease, border-color 150ms ease; }
+.btn-primary{ background:#1D3A2F; color:#fff; border-color:#1D3A2F; }
+.btn-secondary{ background:#fff; color:#252525; border-color:#C4C4C4; }
+.btn-ghost{ background:transparent; color:#3D3D3D; }
+.btn-danger{ background:#C0392B; color:#fff; border-color:#C0392B; }
+.btn-gold{ background:#C4965A; color:#fff; border-color:#C4965A; }
+.btn-sm{ font-size:12px; padding:4px 12px; }
+.btn-lg{ font-size:14px; padding:10px 24px; }
+.btn[disabled]{ opacity:.4; pointer-events:none; }
+.input { font-family:'DM Sans',sans-serif; font-size:13px; color:#141414; background:#fff; border:1px solid #E0E0E0; border-radius:6px; padding:7px 12px; width:100%; box-sizing:border-box; outline:none; }
+.input.auto { background:#F8F8F8; color:#777; font-style:italic; }
+.input.error { border-color:#C0392B; }
+.input.focused { border-color:#1D3A2F; box-shadow: 0 0 0 3px rgba(29,58,47,.1); }
+.field-label{ font-size:12px;font-weight:500;color:#3D3D3D;display:block;margin-bottom:4px }
+.field-hint{ font-size:11px;color:#777;margin-top:4px }
+.field-error{ font-size:11px;color:#C0392B;margin-top:4px }
+.input-auto-badge{ display:inline-flex;align-items:center;font-size:10px;font-weight:500;padding:1px 5px;border-radius:4px;background:#F0F0F0;color:#777;margin-left:6px;vertical-align:middle }
+.tag{ display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;border:1px solid transparent;letter-spacing:.02em }
+.tag-v{ background:#EAF4E2;color:#2D5A1E;border-color:#A8D48A } .tag-vg{ background:#E4F2EC;color:#1D5C3A;border-color:#8FD0AE } .tag-ncgi{ background:#E8F0FB;color:#1A5CA8;border-color:#A8C4EF }
+.tag-toggle{ display:inline-flex;align-items:center;font-size:11px;font-weight:500;padding:3px 12px;border-radius:999px;border:1px solid #C4C4C4;background:#fff;color:#555;cursor:pointer }
+.tag-toggle.on-v{ background:#EAF4E2;color:#2D5A1E;border-color:#A8D48A }
+.tag-toggle.on-vg{ background:#E4F2EC;color:#1D5C3A;border-color:#8FD0AE }
+.tag-toggle.on-ncgi{ background:#E8F0FB;color:#1A5CA8;border-color:#A8C4EF }
+.allergen-cell{ border:1px solid #E0E0E0;border-radius:4px;padding:6px 4px;text-align:center;font-size:10px;color:#777;background:#fff;font-weight:500;line-height:1.3 }
+.allergen-cell.present{ background:#FDECEA;border-color:#C0392B;color:#C0392B;font-weight:600 }
+.allergen-cell.may{ background:#FEF6E7;border-color:#B7791A;color:#B7791A }
+.badge{ display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;letter-spacing:.02em }
+.badge-ready{ background:#EAF5EE;color:#2D7D46;border:1px solid #A3D4B2 }
+.badge-warn{ background:#FEF6E7;color:#B7791A;border:1px solid #F5D08A }
+.badge-danger{ background:#FDECEA;color:#C0392B;border:1px solid #F4B8B3 }
+.badge-neutral{ background:#F0F0F0;color:#555;border:1px solid #C4C4C4 }
+.badge-dot{ width:6px;height:6px;border-radius:50%;background:currentColor }
+.banner{ display:flex;gap:10px;align-items:flex-start;padding:10px 14px;border-radius:8px;border:1px solid;font-size:12px;line-height:1.5 }
+.banner .icon{ font-size:14px;flex-shrink:0;margin-top:1px }
+.banner-warn{ background:#FEF6E7;border-color:#F5D08A;color:#B7791A }
+.banner-danger{ background:#FDECEA;border-color:#F4B8B3;color:#C0392B }
+.banner-success{ background:#EAF5EE;border-color:#A3D4B2;color:#2D7D46 }
+.banner-info{ background:#E8F0FB;border-color:#A8C4EF;color:#1A5CA8 }
+</style>
+</head>
+<body>
+<div class="card-frame">
+<div style="display:flex;flex-direction:column;gap:14px">
+  <div style="display:flex;gap:8px;align-items:center">
+    <span class="tag tag-v">V</span>
+    <span class="tag tag-vg">VG</span>
+    <span class="tag tag-ncgi">NCGI</span>
+    <span style="font-size:11px;color:#999;margin-left:6px">Display — on documents</span>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button class="tag-toggle on-v">V</button>
+    <button class="tag-toggle on-vg">VG</button>
+    <button class="tag-toggle">NCGI</button>
+    <button class="tag-toggle">+ tag</button>
+    <span style="font-size:11px;color:#999;margin-left:6px">Toggle — on entry screen</span>
+  </div>
+</div>
+</div>
+</body>
+</html>

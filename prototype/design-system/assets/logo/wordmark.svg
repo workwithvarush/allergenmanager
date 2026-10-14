@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 32" width="220" height="32" fill="none">
+  <g stroke="#1D3A2F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M16 4C10.5 4 6 8.5 6 14c0 7 10 18 10 18s10-11 10-18C26 8.5 21.5 4 16 4z"></path>
+    <circle cx="16" cy="14" r="3"></circle>
+  </g>
+  <text x="38" y="21" font-family="DM Sans, sans-serif" font-size="15" font-weight="600" fill="#1D3A2F" letter-spacing="-0.2">Allergen manager</text>
+</svg>

@@ -1,0 +1,36 @@
+<!doctype html>
+<!-- @dsCard group="Components" name="Event card + stats" subtitle="Dashboard cell + tri-stat block" viewport="700x210" -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Event card</title>
+<link rel="stylesheet" href="_card.css">
+<style>.b{background:#F0F0F0;color:#555;border:1px solid #C4C4C4;border-radius:4px;font-size:11px;font-weight:600;padding:2px 8px}
+.bp{background:#1D3A2F;color:#fff;border:1px solid #1D3A2F;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer}
+.bs{background:#fff;color:#252525;border:1px solid #C4C4C4;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer}</style>
+</head>
+<body>
+<div class="card-frame">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+  <div style="background:#fff;border:1px solid #E0E0E0;border-radius:12px;padding:18px 20px;box-shadow:0 1px 2px rgba(0,0,0,0.06)">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid #E0E0E0">
+      <div>
+        <div style="font-size:14px;font-weight:600;color:#141414">Nottingham Tech Summit</div>
+        <div style="font-size:11px;color:#777;margin-top:2px;font-family:'DM Mono',monospace">Room 4 · 12:30 · Menu A</div>
+      </div>
+      <span class="b">Menu A</span>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="bp">Fill allergens</button>
+      <button class="bs">Print</button>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+    <div style="background:#F8F8F8;border:1px solid #E0E0E0;border-radius:8px;padding:14px;text-align:center"><div style="font-size:22px;font-weight:600;color:#141414;line-height:1">8</div><div style="font-size:10px;color:#999;margin-top:6px;text-transform:uppercase;letter-spacing:.05em">Dishes</div></div>
+    <div style="background:#F8F8F8;border:1px solid #E0E0E0;border-radius:8px;padding:14px;text-align:center"><div style="font-size:22px;font-weight:600;color:#141414;line-height:1">5</div><div style="font-size:10px;color:#999;margin-top:6px;text-transform:uppercase;letter-spacing:.05em">Allergens</div></div>
+    <div style="background:#F8F8F8;border:1px solid #E0E0E0;border-radius:8px;padding:14px;text-align:center"><div style="font-size:22px;font-weight:600;color:#141414;line-height:1">0</div><div style="font-size:10px;color:#999;margin-top:6px;text-transform:uppercase;letter-spacing:.05em">Printed</div></div>
+  </div>
+</div>
+</div>
+</body>
+</html>

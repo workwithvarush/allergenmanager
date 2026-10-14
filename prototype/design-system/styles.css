@@ -1,0 +1,7 @@
+/* Root global stylesheet for the EMCC Allergen Manager design system.
+   Consumers link this single file; it pulls in tokens, the UI kit, and
+   prototype layout styles in cascade order. */
+
+@import "./colors_and_type.css";
+@import "./ui_kits/allergen-manager/kit.css";
+@import "./prototype/prototype.css";
