@@ -28,13 +28,15 @@ type DashboardProps = {
   initialEvents: AllergenEvent[];
   /** Other venues' events today, for roles that see totals across venues. */
   otherVenueEvents?: AllergenEvent[];
+  /** The venue's menus that can be chosen (not retired), as edited in Menus. */
+  menus: StandardMenu[];
 };
 
 /**
  * Today's events beside the selected event's details. Edits (menu change,
  * reprint flag) are held in the browser until there is a backend to save them.
  */
-export function Dashboard({ venueId, role, today, initialEvents, otherVenueEvents }: DashboardProps) {
+export function Dashboard({ venueId, role, today, initialEvents, otherVenueEvents, menus }: DashboardProps) {
   const now = useVenueClock();
   const [events, setEvents] = useState(initialEvents);
   const [filter, setFilter] = useState<Filter>("all");
@@ -98,8 +100,8 @@ export function Dashboard({ venueId, role, today, initialEvents, otherVenueEvent
       setMenuError(`Menu not changed — ${result.message.charAt(0).toLowerCase()}${result.message.slice(1)}`);
       return;
     }
-    const { menuId, dishes, version, lastModifiedAt } = result;
-    updateEvent(id, (event) => ({ ...event, menuId, menuName: null, dishes, version, lastModifiedAt }));
+    const { menuId, menuName, dishes, version, lastModifiedAt } = result;
+    updateEvent(id, (event) => ({ ...event, menuId, menuName, dishes, version, lastModifiedAt }));
   };
 
   const toggleFlag = () => selected && updateEvent(selected.id, (event) => ({ ...event, flagged: !event.flagged }));
@@ -121,11 +123,14 @@ export function Dashboard({ venueId, role, today, initialEvents, otherVenueEvent
             href={`/venues/${venueId}/calendar?month=${monthOf(today)}&day=${today}`}
             className="btn btn-secondary"
             aria-label={`Today · ${formatDayShort(today)}, open calendar`}
+            data-tour="today"
           >
             Today · {formatDayShort(today)}
           </Link>
           {canCreateEvents(role) && (
-            <Button onClick={() => setCreating(true)}>+ New event</Button>
+            <Button onClick={() => setCreating(true)} data-tour="new-event">
+              + New event
+            </Button>
           )}
         </div>
       </div>
@@ -171,6 +176,7 @@ export function Dashboard({ venueId, role, today, initialEvents, otherVenueEvent
         />
         {selected ? (
           <EventDetail
+            menus={menus}
             key={selected.id}
             event={selected}
             venueId={venueId}
@@ -186,6 +192,7 @@ export function Dashboard({ venueId, role, today, initialEvents, otherVenueEvent
 
       {creating && (
         <NewEventDialog
+          menus={menus}
           venueId={venueId}
           defaultDate={today}
           today={today}

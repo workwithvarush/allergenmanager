@@ -3,8 +3,12 @@ import { Suspense } from "react";
 import { NottinghamVenuesLogo } from "@/components/NottinghamVenuesLogo";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { Skeleton } from "@/components/Skeleton";
+import { getAllEvents, getEventsForDay } from "@/lib/demo-data";
+import { printBlockedReason } from "@/lib/events";
+import { postPrintAlerts } from "@/lib/notifications";
+import { venueDate } from "@/lib/venue-time";
 import { getSessionUser } from "@/lib/session";
-import { VENUES } from "@/lib/venues";
+import { VENUES, type VenueId } from "@/lib/venues";
 import { VenueHeader } from "./VenueHeader";
 import styles from "./VenueShell.module.css";
 
@@ -40,7 +44,20 @@ async function VenueHeaderLoader({ params }: { params: Promise<{ venueId: string
   const venue = VENUES.find((v) => v.id === venueId);
   if (!venue || !venue.available) notFound();
   const user = await getSessionUser();
-  return <VenueHeader venueId={venue.id} venueName={venue.name} user={user} />;
+  const [alerts, tourEventId] = await Promise.all([postPrintAlerts(venue.id, user), tourEvent(venue.id)]);
+  return (
+    <VenueHeader venueId={venue.id} venueName={venue.name} user={user} alerts={alerts} tourEventId={tourEventId} />
+  );
+}
+
+/**
+ * The event the tour shows on the entry and print screens, as in the prototype:
+ * one of today's that is ready to print, else the first today, else any.
+ */
+async function tourEvent(venueId: VenueId): Promise<string | null> {
+  const today = await getEventsForDay(venueId, venueDate(new Date()));
+  const ready = today.find((e) => e.dishes.length > 0 && printBlockedReason(e) === null);
+  return (ready ?? today[0] ?? (await getAllEvents(venueId))[0])?.id ?? null;
 }
 
 function HeaderPlaceholder() {

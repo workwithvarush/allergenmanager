@@ -13,6 +13,8 @@ export type StandardMenu = {
   id: string;
   name: string;
   dishes: readonly MenuDish[];
+  /** Retired menus aren't offered for new events or menu changes; events already using them keep their dishes. */
+  retired?: boolean;
 };
 
 /**
@@ -86,8 +88,54 @@ export const STANDARD_MENUS = [
 
 export type StandardMenuId = (typeof STANDARD_MENUS)[number]["id"];
 
+/** One of the built-in menus (the seed data for the menu editor). */
 export function findMenu(id: string): StandardMenu | undefined {
   return STANDARD_MENUS.find((menu) => menu.id === id);
+}
+
+/** The menus offered for new events and menu changes. */
+export function activeMenus(menus: readonly StandardMenu[]): StandardMenu[] {
+  return menus.filter((menu) => !menu.retired);
+}
+
+/** Sections a dish can sit in, in menu order (as on the printed menu). */
+export const MENU_SECTIONS = ["Starter", "Main", "Side", "Dessert", "AM", "Lunch", "PM", "Other"] as const;
+
+export const MAX_MENU_NAME = 40;
+export const MAX_MENU_DISHES = 60;
+export const MAX_MENU_DISH_NAME = 120;
+
+export type MenuErrors = { name?: string; dishes?: string; dishNames?: Record<number, string> };
+
+/**
+ * Checks a menu from the menu editor; run in the browser and again on the
+ * server. `others` are the venue's other menus, for unique names.
+ */
+export function validateMenu(
+  menu: { name: string; dishes: readonly { section: string; name: string }[] },
+  others: readonly StandardMenu[],
+): MenuErrors {
+  const errors: MenuErrors = {};
+  const name = menu.name.trim();
+  if (!name) errors.name = "Menu name is required";
+  else if (name.length > MAX_MENU_NAME) errors.name = `Menu name must be ${MAX_MENU_NAME} characters or fewer`;
+  else if (others.some((m) => m.name.trim().toLocaleLowerCase("en-GB") === name.toLocaleLowerCase("en-GB"))) {
+    errors.name = "Another menu already has this name";
+  }
+  if (menu.dishes.length === 0) errors.dishes = "A menu needs at least one dish";
+  else if (menu.dishes.length > MAX_MENU_DISHES) errors.dishes = `A menu can hold at most ${MAX_MENU_DISHES} dishes`;
+  const dishNames: Record<number, string> = {};
+  menu.dishes.forEach((dish, i) => {
+    if (!dish.name.trim()) dishNames[i] = "Dish name is required";
+    else if (dish.name.trim().length > MAX_MENU_DISH_NAME) dishNames[i] = `Dish name must be ${MAX_MENU_DISH_NAME} characters or fewer`;
+    if (!(MENU_SECTIONS as readonly string[]).includes(dish.section)) dishNames[i] ??= "Choose a section";
+  });
+  if (Object.keys(dishNames).length) errors.dishNames = dishNames;
+  return errors;
+}
+
+export function hasMenuErrors(errors: MenuErrors): boolean {
+  return Boolean(errors.name || errors.dishes || errors.dishNames);
 }
 
 /**

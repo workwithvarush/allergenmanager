@@ -145,9 +145,13 @@ export function eventDateLabel(event: AllergenEvent): string {
   return event.endDate && event.endDate !== event.date ? `${start} – ${formatDayShort(event.endDate)}` : start;
 }
 
-/** "Menu A", or a custom menu's name. */
-export function menuLabel(event: AllergenEvent): string {
-  return event.menuId ? `Menu ${event.menuId}` : (event.menuName ?? `${event.dishes.length} dishes`);
+/**
+ * The menu's name as it was when the event took it on (renaming a menu later
+ * doesn't relabel old events), e.g. "Menu A" or a custom menu's name.
+ */
+export function menuLabel(event: Pick<AllergenEvent, "menuId" | "menuName" | "dishes">): string {
+  if (event.menuName) return event.menuName;
+  return event.menuId ? `Menu ${event.menuId}` : `${event.dishes.length} dishes`;
 }
 
 export const MAX_DISH_NAME = 120;

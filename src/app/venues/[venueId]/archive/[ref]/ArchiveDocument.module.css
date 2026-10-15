@@ -1,0 +1,372 @@
+/* Change log archive document — A4 pages, values from the prototype */
+
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 28px;
+  background: var(--white);
+  border-bottom: 1px solid var(--neutral-200);
+}
+
+.toolbarRef {
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--fg-4);
+}
+
+.desk {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 28px 24px 40px;
+  overflow-x: auto;
+  background: var(--neutral-100);
+}
+
+.page {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  width: 210mm;
+  height: 297mm;
+  padding: 48px 64px 40px;
+  overflow: hidden;
+  background: var(--white);
+  border: 1px solid var(--neutral-200);
+  box-shadow: var(--shadow-sm);
+}
+
+.page p,
+.page h1,
+.page h2 {
+  margin: 0;
+}
+
+.pageContent {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Cover */
+
+.cover {
+  padding: 64px 64px 48px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brandLabel {
+  padding-left: 12px;
+  font-size: 11px;
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-4);
+  border-left: 1px solid var(--neutral-200);
+}
+
+.coverTitleBlock {
+  margin-top: 170px;
+}
+
+.coverVenue {
+  font-size: 11px;
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--fg-4);
+}
+
+.coverTitle {
+  margin-top: 14px !important;
+  font-size: 42px;
+  font-weight: var(--fw-semibold);
+  letter-spacing: -1.1px;
+  line-height: 1.05;
+  color: var(--brand-forest);
+}
+
+.coverMonth {
+  margin-top: 10px !important;
+  font-size: 22px;
+  font-weight: var(--fw-medium);
+  letter-spacing: -0.3px;
+  color: var(--fg-2);
+}
+
+.coverRule {
+  width: 96px;
+  height: 2px;
+  margin-top: 26px;
+  background: var(--brand-forest);
+}
+
+.coverFacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin-top: 20px !important;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--fg-3);
+}
+
+.partial {
+  margin-top: 26px;
+  font-size: 12.5px;
+  color: var(--fg-1);
+}
+
+.summary {
+  margin-top: 44px;
+  margin-bottom: auto;
+}
+
+.summaryTitle {
+  margin-bottom: 14px !important;
+  font-size: 10.5px;
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--fg-4);
+}
+
+.figures {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  margin: 0;
+  overflow: hidden;
+  background: var(--neutral-200);
+  border: 1px solid var(--neutral-200);
+  border-radius: 8px;
+}
+
+/* Fills the grid's spare cell so it shows white, not the divider colour. */
+.figures::after {
+  content: "";
+  background: var(--white);
+}
+
+.figure {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 86px;
+  padding: 16px 18px;
+  background: var(--white);
+}
+
+.figure dd {
+  margin: 0;
+}
+
+.figureValue {
+  order: -1;
+  font-size: 26px;
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.6px;
+  line-height: 1;
+  color: var(--brand-forest);
+}
+
+.figureLabel {
+  font-size: 11px;
+  font-weight: var(--fw-medium);
+  color: var(--fg-3);
+}
+
+.figureSub {
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--fg-4);
+}
+
+/* Entry pages */
+
+.pageHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+  padding-bottom: 11px;
+  border-bottom: 1px solid var(--neutral-200);
+}
+
+.pageHeaderTitle {
+  font-size: 11px;
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.1px;
+  color: var(--fg-2);
+}
+
+.pageHeaderRef {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--fg-4);
+}
+
+.group {
+  margin-bottom: 10px;
+}
+
+.group:not(:first-of-type) {
+  margin-top: 22px;
+}
+
+.groupHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--neutral-200);
+}
+
+.groupName {
+  flex: 1;
+  min-width: 0;
+  font-size: 13.5px;
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.15px;
+  color: var(--fg-1);
+}
+
+.groupStamp {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  white-space: nowrap;
+  color: var(--fg-4);
+}
+
+.groupMeta {
+  margin-top: 5px !important;
+  font-size: 11px;
+  color: var(--fg-4);
+}
+
+.entry {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 9px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid var(--neutral-100);
+}
+
+.entryTime {
+  flex-shrink: 0;
+  width: 96px;
+  white-space: nowrap;
+  padding-top: 2px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--fg-4);
+}
+
+.entryDot {
+  margin-top: 5px;
+}
+
+.entryBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.entryLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--fg-2);
+}
+
+.entryLine strong {
+  font-weight: var(--fw-semibold);
+  color: var(--fg-1);
+}
+
+.entryEmail {
+  margin-top: 2px !important;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--fg-4);
+}
+
+.emptyPeriod {
+  padding: 28px 20px;
+  font-size: 12.5px;
+  color: var(--fg-3);
+  background: var(--neutral-50);
+  border: 1px dashed var(--neutral-300);
+  border-radius: 8px;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 12px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--fg-4);
+  border-top: 1px solid var(--neutral-200);
+}
+
+.footerRight {
+  white-space: nowrap;
+}
+
+.denied {
+  padding: 24px 28px;
+}
+
+.denied h1 {
+  margin: 0;
+  font-size: var(--text-2xl);
+  font-weight: var(--fw-semibold);
+}
+
+.denied p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--fg-4);
+}
+
+/* Printing: just the pages, one per A4 sheet. */
+@media print {
+  .desk {
+    display: block;
+    padding: 0;
+    background: none;
+  }
+
+  .page {
+    border: none;
+    box-shadow: none;
+    break-after: page;
+  }
+}
+
+.notice {
+  margin: 16px 28px 0;
+}

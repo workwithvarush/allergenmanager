@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { LoadingPlaceholder, Skeleton } from "@/components/Skeleton";
-import { getEvent } from "@/lib/demo-data";
+import { getEvent, getMenus } from "@/lib/demo-data";
+import { activeMenus } from "@/lib/menus";
 import { VENUES } from "@/lib/venues";
 import { EventEntry } from "./EventEntry";
 import styles from "./EventEntry.module.css";
@@ -33,7 +34,8 @@ async function EntryLoader({ params }: { params: Promise<{ venueId: string; even
   await connection();
   const event = await getEvent(venue.id, eventId);
   if (!event) notFound();
-  return <EventEntry key={event.id} initialEvent={event} />;
+  const menus = activeMenus(await getMenus(venue.id));
+  return <EventEntry key={event.id} initialEvent={event} menus={menus} />;
 }
 
 function EntryLoading() {

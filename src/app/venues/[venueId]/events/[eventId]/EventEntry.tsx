@@ -74,7 +74,7 @@ function dishStatus(dish: Dish): DishStatus {
  * The allergen entry screen's dish list. Every change is saved straight away
  * (dish names after a short pause in typing) and the version stamp updates.
  */
-export function EventEntry({ initialEvent }: { initialEvent: AllergenEvent }) {
+export function EventEntry({ initialEvent, menus }: { initialEvent: AllergenEvent; menus: StandardMenu[] }) {
   const [event, setEvent] = useState(initialEvent);
   const [save, setSave] = useState<{ state: SaveState; savedAt?: Date; message?: string }>({ state: "idle" });
   /** The dish whose removal is being confirmed. */
@@ -244,8 +244,8 @@ export function EventEntry({ initialEvent }: { initialEvent: AllergenEvent }) {
     await runSave(async () => {
       const result = await changeMenu(event.venueId, event.id, menu.id);
       if (result.ok) {
-        const { menuId, dishes } = result;
-        setEvent((current) => ({ ...current, menuId, menuName: null, dishes }));
+        const { menuId, menuName, dishes } = result;
+        setEvent((current) => ({ ...current, menuId, menuName, dishes }));
       }
       return result;
     });
@@ -318,13 +318,13 @@ export function EventEntry({ initialEvent }: { initialEvent: AllergenEvent }) {
   const dashboardHref = `/venues/${event.venueId}/dashboard`;
   const printHref = `/venues/${event.venueId}/events/${event.id}/print`;
 
-  const printButton = (label: string, id: string) =>
+  const printButton = (label: string, id: string, tour?: string) =>
     blocked ? (
-      <Button variant="gold" disabled aria-describedby={id}>
+      <Button variant="gold" disabled aria-describedby={id} data-tour={tour}>
         {label}
       </Button>
     ) : (
-      <Link href={printHref} prefetch={false} className="btn btn-gold">
+      <Link href={printHref} prefetch={false} className="btn btn-gold" data-tour={tour}>
         {label}
       </Link>
     );
@@ -354,7 +354,7 @@ export function EventEntry({ initialEvent }: { initialEvent: AllergenEvent }) {
             <span className={styles.version}>
               v{event.version} · edited {event.lastModifiedAt}
             </span>
-            {printButton("Preview & print", "print-blocked-head")}
+            {printButton("Preview & print", "print-blocked-head", "entry-print")}
           </div>
         </div>
         {blocked && (
@@ -444,6 +444,7 @@ export function EventEntry({ initialEvent }: { initialEvent: AllergenEvent }) {
                   dishLabel={dish.name.trim() || `Dish ${i + 1}`}
                   onCycle={(allergen) => cycleAllergen(dish.id, allergen)}
                   onEditNote={(allergen) => setNoteEditing({ dishId: dish.id, allergen })}
+                  tour={i === 0}
                 />
                 {noteEditing?.dishId === dish.id && (
                   <NoteEditor
@@ -471,6 +472,7 @@ export function EventEntry({ initialEvent }: { initialEvent: AllergenEvent }) {
                     aria-disabled={completeBlocked ? true : undefined}
                     aria-describedby={completeBlocked ? `complete-reason-${dish.id}` : undefined}
                     aria-label={`${dish.complete ? "Mark in progress" : "Mark complete"}: ${label}`}
+                    data-tour={i === 0 ? "mark-complete" : undefined}
                     onClick={() => !completeBlocked && toggleComplete(dish.id, !dish.complete)}
                   >
                     {dish.complete ? "Mark in progress" : "Mark dish complete"}
@@ -520,6 +522,7 @@ export function EventEntry({ initialEvent }: { initialEvent: AllergenEvent }) {
       {changingMenu && event.menuId && (
         <ChangeMenuDialog
           event={event}
+          menus={menus}
           initialMenuId={event.menuId}
           pickMenu
           pending={menuPending}

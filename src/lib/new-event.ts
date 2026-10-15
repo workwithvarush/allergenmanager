@@ -1,5 +1,4 @@
 import { isIsoDate } from "@/lib/dates";
-import { findMenu } from "@/lib/menus";
 import { ROOMS } from "@/lib/venues";
 
 /** What the New event form sends. Numbers stay as typed so half-filled fields can be shown back. */
@@ -51,7 +50,16 @@ export const MAX_YEARS_AWAY = 2;
  */
 export function validateNewEvent(
   input: NewEventInput,
-  { standardMenus, today }: { standardMenus: boolean; today: string },
+  {
+    standardMenus,
+    today,
+    menuIds,
+  }: {
+    standardMenus: boolean;
+    today: string;
+    /** The menus that can be chosen (the venue's, not retired). */
+    menuIds: readonly string[];
+  },
 ): NewEventErrors {
   const errors: NewEventErrors = {};
   if (!input.name.trim()) errors.name = "Event name is required";
@@ -67,7 +75,7 @@ export function validateNewEvent(
   const guests = countError(input.guests, "Guest count", MAX_GUESTS);
   if (guests) errors.guests = guests;
   const custom = !standardMenus || input.menu === "custom";
-  if (!custom && !findMenu(input.menu)) errors.menu = "Starting menu is required";
+  if (!custom && !menuIds.includes(input.menu)) errors.menu = "Starting menu is required";
   if (custom) {
     if (input.customName.trim().length > 80) errors.customName = "Menu name must be 80 characters or fewer";
     const numDishes = countError(input.numDishes, "Number of dishes", MAX_DISHES);

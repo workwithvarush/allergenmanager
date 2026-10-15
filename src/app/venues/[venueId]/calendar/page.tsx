@@ -4,7 +4,8 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import { LoadingPlaceholder, Skeleton } from "@/components/Skeleton";
 import { daysOfMonth, isIsoDate, isIsoMonth, monthOf } from "@/lib/dates";
-import { getEventsBetween } from "@/lib/demo-data";
+import { getEventsBetween, getMenus } from "@/lib/demo-data";
+import { activeMenus } from "@/lib/menus";
 import { sortByServiceTime } from "@/lib/events";
 import { canCreateCustomMenu, canCreateEvents } from "@/lib/permissions";
 import { getSessionUser } from "@/lib/session";
@@ -59,6 +60,7 @@ async function CalendarMonth({
 
   return (
     <MonthCalendar
+      menus={activeMenus(await getMenus(venue.id))}
       venueId={venue.id}
       today={today}
       month={month}

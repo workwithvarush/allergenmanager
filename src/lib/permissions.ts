@@ -34,3 +34,23 @@ export function canCreateEvents(role: Role): boolean {
 export function canCreateCustomMenu(role: Role): boolean {
   return role === "Supervisor" || role === "F&B Manager";
 }
+
+/** Everyone except Allergen Members can see the monthly change log archives. */
+export function canViewArchive(role: Role): boolean {
+  return role !== "Allergen Member";
+}
+
+/** Supervisors and F&B Managers can issue this month's archive before month end. */
+export function canGenerateArchive(role: Role): boolean {
+  return role === "Supervisor" || role === "F&B Manager";
+}
+
+/** Supervisors and F&B Managers maintain the venue's standard menus (the menu editor). */
+export function canManageMenus(role: Role): boolean {
+  return role === "Supervisor" || role === "F&B Manager";
+}
+
+/** F&B Managers add staff accounts, change roles and disable accounts. */
+export function canManageStaff(role: Role): boolean {
+  return role === "F&B Manager";
+}

@@ -3,7 +3,7 @@
 import { refresh } from "next/cache";
 import { allergenLabel, isAllergenId } from "@/lib/allergens";
 import { makeLogEntry, type LogActor } from "@/lib/changelog";
-import { getEvent, saveEvent } from "@/lib/demo-data";
+import { getEvent, getMenus, saveEvent } from "@/lib/demo-data";
 import { conflictingTags, DIETARY_TAGS, tagConflict, venueTags } from "@/lib/dietary-tags";
 import {
   completeBlockedReason,
@@ -15,7 +15,7 @@ import {
   type AllergenMark,
   type Dish,
 } from "@/lib/events";
-import { findMenu, instantiateMenu } from "@/lib/menus";
+import { activeMenus, instantiateMenu } from "@/lib/menus";
 import { MAX_DISHES } from "@/lib/new-event";
 import { getSessionUser } from "@/lib/session";
 import { venueTime } from "@/lib/venue-time";
@@ -238,7 +238,7 @@ export async function setComplete(
 }
 
 export type ChangeMenuResult =
-  | { ok: true; version: number; lastModifiedAt: string; menuId: string; dishes: Dish[] }
+  | { ok: true; version: number; lastModifiedAt: string; menuId: string; menuName: string; dishes: Dish[] }
   | { ok: false; message: string };
 
 /**
@@ -247,15 +247,16 @@ export type ChangeMenuResult =
  * Returns the new dishes so the page can show them.
  */
 export async function changeMenu(venueId: string, eventId: string, menuId: string): Promise<ChangeMenuResult> {
-  const menu = findMenu(menuId);
-  if (!menu) return { ok: false, message: "That menu doesn't exist." };
+  const venueForMenus = VENUES.find((v) => v.id === venueId && v.available);
+  const menu = venueForMenus && activeMenus(await getMenus(venueForMenus.id)).find((m) => m.id === menuId);
+  if (!menu) return { ok: false, message: "That menu isn't available." };
   const result = await editEvent(venueId, eventId, (event) => {
     if (!usesStandardMenus(event.venueId) || event.menuId === null) {
       return "This event uses a custom menu, so its menu can't be switched.";
     }
     if (event.menuId === menu.id) return null;
     return {
-      event: { ...event, menuId: menu.id, menuName: null, dishes: instantiateMenu(menu) },
+      event: { ...event, menuId: menu.id, menuName: menu.name, dishes: instantiateMenu(menu) },
       log: `Menu changed to ${menu.name} — dish list replaced`,
     };
   });
@@ -263,7 +264,7 @@ export async function changeMenu(venueId: string, eventId: string, menuId: strin
   const venue = VENUES.find((v) => v.id === venueId);
   const saved = venue && (await getEvent(venue.id, eventId));
   if (!saved) return { ok: false, message: "This event no longer exists." };
-  return { ...result, menuId: menu.id, dishes: saved.dishes };
+  return { ...result, menuId: menu.id, menuName: menu.name, dishes: saved.dishes };
 }
 
 /** Sets the additional message printed below the allergen sheet; "" removes it. */

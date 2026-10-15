@@ -28,3 +28,14 @@ export function venueNow(now = new Date()): string {
 export function makeLogEntry(actor: LogActor, type: LogType, text: string, at = venueNow()): LogEntry {
   return { id: crypto.randomUUID(), at, type, text, ...actor };
 }
+
+/** CSS class (in Changelog.module.css) for a role badge, from the prototype's palette. */
+export function roleClass(role: string): string {
+  const classes: Record<string, string> = {
+    "F&B Manager": "roleManager",
+    Supervisor: "roleSupervisor",
+    Chef: "roleChef",
+    "Allergen Member": "roleMember",
+  };
+  return classes[role] ?? "roleAutomatic";
+}

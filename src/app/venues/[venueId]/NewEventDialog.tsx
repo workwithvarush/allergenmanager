@@ -6,7 +6,7 @@ import { Dialog } from "@/components/Dialog";
 import { Select } from "@/components/Select";
 import { TextField } from "@/components/TextField";
 import { isIsoDate } from "@/lib/dates";
-import { findMenu, STANDARD_MENUS } from "@/lib/menus";
+import type { StandardMenu } from "@/lib/menus";
 import {
   MAX_DISHES,
   MAX_GUESTS,
@@ -30,6 +30,8 @@ type NewEventDialogProps = {
   today: string;
   /** EMCC picks a standard menu; Bramleys builds every menu dish by dish. */
   standardMenus: boolean;
+  /** The venue's menus that can be chosen (not retired), as edited in Menus. */
+  menus: readonly StandardMenu[];
   /** Whether "Custom menu" is offered alongside the standard menus (Supervisor, F&B Manager). */
   canCustomMenu: boolean;
   onClose: () => void;
@@ -45,10 +47,12 @@ export function NewEventDialog({
   defaultDate,
   today,
   standardMenus,
+  menus,
   canCustomMenu,
   onClose,
   onCreated,
 }: NewEventDialogProps) {
+  const menuIds = menus.map((m) => m.id);
   const formId = useId();
   const formRef = useRef<HTMLFormElement>(null);
   const [form, setForm] = useState<NewEventInput>({
@@ -57,7 +61,7 @@ export function NewEventDialog({
     room: ROOMS[0],
     time: "12:30",
     guests: "",
-    menu: standardMenus ? STANDARD_MENUS[0].id : "custom",
+    menu: standardMenus ? (menus[0]?.id ?? (canCustomMenu ? "custom" : "")) : "custom",
     customName: "",
     numDishes: "",
   });
@@ -67,10 +71,10 @@ export function NewEventDialog({
   const [submitCount, setSubmitCount] = useState(0);
   const [pending, startTransition] = useTransition();
 
-  const errors = { ...validateNewEvent(form, { standardMenus, today }), ...serverErrors };
+  const errors = { ...validateNewEvent(form, { standardMenus, today, menuIds }), ...serverErrors };
   const shown = (field: NewEventField) => (touched[field] ? errors[field] : undefined);
   const custom = !standardMenus || form.menu === "custom";
-  const menu = custom ? undefined : findMenu(form.menu);
+  const menu = custom ? undefined : menus.find((m) => m.id === form.menu);
   // Only a valid count is previewed ("2.5" or "-1" show as 0).
   const dishCount = errors.numDishes ? 0 : Number(form.numDishes);
 
@@ -103,7 +107,7 @@ export function NewEventDialog({
     if (pending) return;
     setMessage(null);
     setTouched({ name: true, date: true, room: true, time: true, guests: true, menu: true, customName: true, numDishes: true });
-    if (Object.keys(validateNewEvent(form, { standardMenus, today })).length > 0) {
+    if (Object.keys(validateNewEvent(form, { standardMenus, today, menuIds })).length > 0) {
       setSubmitCount((n) => n + 1);
       return;
     }
@@ -214,7 +218,7 @@ export function NewEventDialog({
               Pick the standard menu to seed this event&apos;s dish list. Review every dish before printing.
             </p>
             <div className={styles.menuCards}>
-              {STANDARD_MENUS.map((m) => (
+              {menus.map((m) => (
                 <label key={m.id} className={styles.menuCard}>
                   <input
                     type="radio"

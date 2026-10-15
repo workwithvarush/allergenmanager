@@ -90,7 +90,7 @@ export function EventList({ visible, noEvents, filter, selectedId, onSelect, now
   }
 
   return (
-    <ul className={styles.rows}>
+    <ul className={styles.rows} data-tour="event-rows">
       {visible.map((event) => {
         const lane = eventLane(event);
         const done = dishesDone(event);

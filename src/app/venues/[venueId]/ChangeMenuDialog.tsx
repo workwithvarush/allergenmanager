@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { Button } from "@/components/Button";
 import { Dialog } from "@/components/Dialog";
-import { dishesWithEntries, type AllergenEvent } from "@/lib/events";
-import { findMenu, STANDARD_MENUS, type StandardMenu } from "@/lib/menus";
+import { dishesWithEntries, menuLabel, type AllergenEvent } from "@/lib/events";
+import type { StandardMenu } from "@/lib/menus";
 import styles from "./ChangeMenuDialog.module.css";
 
 type ChangeMenuDialogProps = {
-  event: Pick<AllergenEvent, "name" | "menuId" | "dishes" | "lastPrintedAt">;
+  event: Pick<AllergenEvent, "name" | "menuId" | "menuName" | "dishes" | "lastPrintedAt">;
+  /** The venue's menus that can be switched to (not retired). */
+  menus: readonly StandardMenu[];
   /** The menu to switch to; with `pickMenu`, the one selected when the dialog opens. */
   initialMenuId: string;
   /** Show the standard menus to choose from (allergen entry), not just a confirmation (dashboard). */
@@ -24,10 +26,19 @@ type ChangeMenuDialogProps = {
  * completed dish is lost. As in the prototype, this says how much entry will be
  * discarded before anything changes; it also flags when printed sheets will go out of date.
  */
-export function ChangeMenuDialog({ event, initialMenuId, pickMenu = false, pending = false, onCancel, onConfirm }: ChangeMenuDialogProps) {
+export function ChangeMenuDialog({
+  event,
+  menus,
+  initialMenuId,
+  pickMenu = false,
+  pending = false,
+  onCancel,
+  onConfirm,
+}: ChangeMenuDialogProps) {
   const [menuId, setMenuId] = useState(initialMenuId);
-  const target = findMenu(menuId);
-  const current = event.menuId ? findMenu(event.menuId) : undefined;
+  const target = menus.find((m) => m.id === menuId);
+  // The name the event took the menu on with (it may have been renamed or retired since).
+  const current = event.menuId ? { name: menuLabel(event) } : undefined;
   const changing = target !== undefined && target.id !== event.menuId;
   const entered = dishesWithEntries(event);
   const completed = event.dishes.filter((d) => d.complete).length;
@@ -57,7 +68,7 @@ export function ChangeMenuDialog({ event, initialMenuId, pickMenu = false, pendi
       {pickMenu && (
         <fieldset className={styles.menus}>
           <legend className="sr-only">Menu</legend>
-          {STANDARD_MENUS.map((menu) => (
+          {menus.map((menu) => (
             <label key={menu.id} className={styles.menu}>
               <input
                 type="radio"

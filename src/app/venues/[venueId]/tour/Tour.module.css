@@ -1,0 +1,223 @@
+/* Help button and guided tour — prototype values */
+
+.help {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: var(--fw-semibold);
+  color: var(--fg-3);
+  background: var(--white);
+  border: 1px solid var(--neutral-200);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.help:hover {
+  color: var(--fg-1);
+  background: var(--neutral-50);
+}
+
+.layer {
+  position: fixed;
+  inset: 0;
+  z-index: 88;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+}
+
+/* The highlight: a gold ring with everything else dimmed by its huge shadow. */
+.spotlight {
+  position: fixed;
+  border: 2px solid var(--brand-gold);
+  border-radius: 10px;
+  box-shadow: 0 0 0 9999px rgba(20, 20, 20, 0.55);
+  pointer-events: none;
+  transition:
+    top 200ms ease,
+    left 200ms ease,
+    width 200ms ease,
+    height 200ms ease;
+}
+
+.dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 20, 20, 0.55);
+  pointer-events: none;
+}
+
+.card {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+  border: 1px solid var(--neutral-200);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  transition:
+    top 200ms ease,
+    left 200ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spotlight,
+  .card {
+    transition: none;
+  }
+}
+
+.cardHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px 0;
+}
+
+.stepLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--fg-4);
+}
+
+.close {
+  padding: 0 2px;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--fg-4);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: var(--fg-1);
+}
+
+.cardBody {
+  padding: 6px 16px 14px;
+}
+
+.title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.2px;
+  color: var(--fg-1);
+}
+
+.body {
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--fg-2);
+}
+
+.points {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.points li {
+  position: relative;
+  padding-left: 13px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--fg-3);
+}
+
+.points li::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  background: var(--brand-forest);
+  border-radius: 999px;
+}
+
+.cardFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--neutral-50);
+  border-top: 1px solid var(--neutral-200);
+  border-radius: 0 0 12px 12px;
+}
+
+.dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.dot,
+.dotActive {
+  display: block;
+  width: 5px;
+  height: 5px;
+  background: var(--neutral-300);
+  border-radius: 999px;
+}
+
+.dotActive {
+  width: 14px;
+  background: var(--brand-forest);
+}
+
+.actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 6px;
+}
+
+.back,
+.next {
+  padding: 6px 13px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: var(--fw-medium);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.back {
+  color: var(--fg-2);
+  background: var(--white);
+  border: 1px solid var(--neutral-300);
+}
+
+.back:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.next {
+  color: var(--white);
+  background: var(--brand-forest);
+  border: 1px solid var(--brand-forest);
+}
+
+.next:focus-visible,
+.back:focus-visible,
+.close:focus-visible {
+  outline: 2px solid var(--brand-forest);
+  outline-offset: 2px;
+}

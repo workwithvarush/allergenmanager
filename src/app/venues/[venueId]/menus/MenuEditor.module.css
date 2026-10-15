@@ -1,0 +1,279 @@
+/* Menu editor — follows the archive and calendar screens */
+
+.screen {
+  width: 100%;
+  padding: 24px 28px 32px;
+}
+
+.header {
+  margin-bottom: 18px;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--text-2xl);
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.3px;
+  line-height: 1.15;
+  color: var(--fg-1);
+}
+
+.sub {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--fg-4);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.menuList,
+.editor {
+  background: var(--white);
+  border: 1px solid var(--neutral-200);
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+}
+
+.menuList {
+  padding: 8px;
+}
+
+.menuList ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.menuItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  font: inherit;
+  text-align: left;
+  color: var(--fg-1);
+  cursor: pointer;
+}
+
+.menuItem:hover {
+  background: var(--neutral-100);
+}
+
+.menuItem[aria-current="true"] {
+  background: var(--brand-forest-faint);
+  box-shadow: inset 3px 0 0 var(--brand-forest);
+}
+
+.menuItemName {
+  font-size: 14px;
+  font-weight: var(--fw-semibold);
+}
+
+.menuItemMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--fg-4);
+}
+
+.retiredBadge {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--neutral-200);
+  font-size: 11px;
+  font-weight: var(--fw-semibold);
+  color: var(--fg-3);
+}
+
+.newMenu {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.editor {
+  padding: 20px 22px;
+}
+
+.editorHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.editorTitle {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: var(--fw-semibold);
+  color: var(--fg-1);
+  overflow-wrap: anywhere;
+}
+
+.note {
+  margin: 4px 0 16px;
+  font-size: 12px;
+  color: var(--fg-4);
+}
+
+.nameInput {
+  max-width: 360px;
+}
+
+.dishesTitle {
+  margin: 20px 0 8px;
+  font-size: 13px;
+  font-weight: var(--fw-semibold);
+  color: var(--fg-2);
+}
+
+.dishes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dish {
+  display: grid;
+  grid-template-columns: 22px 130px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px;
+}
+
+.dishIndex {
+  padding-top: 10px;
+  font-size: 12px;
+  text-align: right;
+  color: var(--fg-4);
+  font-variant-numeric: tabular-nums;
+}
+
+.section {
+  width: 100%;
+}
+
+.dishNameField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.dishActions {
+  display: flex;
+  gap: 4px;
+}
+
+.iconButton {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--neutral-200);
+  border-radius: 6px;
+  background: var(--white);
+  font-size: 14px;
+  color: var(--fg-2);
+  cursor: pointer;
+}
+
+.iconButton:hover:not(:disabled) {
+  background: var(--neutral-100);
+}
+
+.iconButton:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.addDish {
+  margin-top: 10px;
+  padding: 8px 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: var(--fw-semibold);
+  color: var(--fg-2);
+  cursor: pointer;
+}
+
+.addDish:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+.addDish:disabled {
+  color: var(--fg-4);
+  cursor: default;
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--neutral-200);
+}
+
+.footerStart,
+.footerEnd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.unsaved {
+  font-size: 12px;
+  color: var(--fg-3);
+}
+
+.dialogBody {
+  margin: 0;
+}
+
+@media (max-width: 760px) {
+  .screen {
+    padding: 18px 16px 28px;
+  }
+
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .editor {
+    padding: 16px;
+  }
+
+  .dishes {
+    gap: 12px;
+  }
+
+  .dish {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--neutral-200);
+  }
+
+  .dishIndex {
+    display: none;
+  }
+
+  .dishNameField {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}

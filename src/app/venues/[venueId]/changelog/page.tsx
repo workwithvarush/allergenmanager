@@ -4,16 +4,31 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { LoadingPlaceholder, Skeleton } from "@/components/Skeleton";
-import type { LogEntry } from "@/lib/changelog";
-import { addDays, formatDayShort } from "@/lib/dates";
-import { getAllEvents } from "@/lib/demo-data";
-import { canSwitchVenue } from "@/lib/permissions";
+import { roleClass, type LogEntry } from "@/lib/changelog";
+import { earlyArchiveWording } from "@/lib/archives";
+import { formatDayShort, monthOf } from "@/lib/dates";
+import { getAllEvents, getArchives } from "@/lib/demo-data";
+import { canGenerateArchive, canSwitchVenue } from "@/lib/permissions";
+import { ROLES } from "@/lib/roles";
 import { getSessionUser } from "@/lib/session";
 import { venueDate } from "@/lib/venue-time";
 import { VENUES, type VenueId } from "@/lib/venues";
+import { GenerateEarly } from "../archive/GenerateEarly";
 import { ChangelogControls } from "./ChangelogControls";
 import styles from "./Changelog.module.css";
-import { matchesSearch, MAX_SEARCH, PERIODS, type Period } from "./periods";
+import {
+  DEFAULT_PERIOD,
+  FILTER_KEYS,
+  FILTER_LABELS,
+  matchesSearch,
+  MAX_SEARCH,
+  periodStart,
+  PERIODS,
+  type FilterOption,
+  type FilterOptions,
+  type Filters,
+  type Period,
+} from "./periods";
 
 export async function generateMetadata({ params }: PageProps<"/venues/[venueId]/changelog">): Promise<Metadata> {
   const { venueId } = await params;
@@ -36,9 +51,6 @@ export default function ChangelogPage({ params, searchParams }: PageProps<"/venu
   );
 }
 
-/** How many days back each period reaches, as in the prototype (today, 7 days, 30 days). */
-const PERIOD_DAYS: Record<Period, number | null> = { today: 0, week: 6, month: 30, all: null };
-
 type Row = LogEntry & { eventId: string; eventName: string; venueId: VenueId };
 
 async function Changelog({
@@ -56,7 +68,7 @@ async function Changelog({
   const user = await getSessionUser();
   const today = venueDate(new Date());
 
-  const period: Period = PERIODS.some((p) => p.id === query.period) ? (query.period as Period) : "today";
+  const period: Period = PERIODS.some((p) => p.id === query.period) ? (query.period as Period) : DEFAULT_PERIOD;
   const search = typeof query.q === "string" ? query.q.trim().slice(0, MAX_SEARCH) : "";
   const multiVenue = canSwitchVenue(user.role);
   const available = VENUES.filter((v) => v.available);
@@ -67,9 +79,8 @@ async function Changelog({
       : venue.id;
   const venueIds = venueChoice === "all" ? available.map((v) => v.id) : [venueChoice];
 
-  const reach = PERIOD_DAYS[period];
-  const from = reach === null ? null : addDays(today, -reach);
-  const rows: Row[] = (
+  // Every entry at the chosen venue(s), before the period, search and filters narrow it.
+  const scope: Row[] = (
     await Promise.all(
       venueIds.map(async (venueId) =>
         (await getAllEvents(venueId)).flatMap((event) =>
@@ -77,10 +88,28 @@ async function Changelog({
         ),
       ),
     )
-  )
-    .flat()
+  ).flat();
+
+  // Filter choices come from the whole scope, so they don't vanish when the period or search narrows the list.
+  const options = filterOptions(scope, venueChoice === "all");
+  const filters: Filters = {
+    person: options.person.some((o) => o.value === query.person) ? (query.person as string) : "",
+    role: options.role.some((o) => o.value === query.role) ? (query.role as string) : "",
+    event: options.event.some((o) => o.value === query.event) ? (query.event as string) : "",
+  };
+  const activeFilters = FILTER_KEYS.filter((key) => filters[key]);
+
+  const from = periodStart(period, today);
+  const thisMonthArchive = (await getArchives(venue.id)).find((a) => a.month === monthOf(today));
+  const rows = scope
     .filter((row) => from === null || row.at.slice(0, 10) >= from)
     .filter((row) => !search || matchesSearch(search, [row.text, row.name, row.role, row.eventName]))
+    .filter(
+      (row) =>
+        (!filters.person || row.name === filters.person) &&
+        (!filters.role || row.role === filters.role) &&
+        (!filters.event || row.eventId === filters.event),
+    )
     // Newest first; entries in the same minute keep the order they were made in (latest first).
     .map((row, i) => ({ row, i }))
     .sort((a, b) => b.row.at.localeCompare(a.row.at) || b.i - a.i)
@@ -90,6 +119,19 @@ async function Changelog({
   const periodLabel = PERIODS.find((p) => p.id === period)!.label.toLowerCase();
   const when = period === "all" ? "in total" : periodLabel;
   const count = `${rows.length} ${rows.length === 1 ? "entry" : "entries"}`;
+  // What narrows the list, for the count and the empty message: “milk” and the filters.
+  const narrowing = [search && `“${search}”`, activeFilters.length > 0 && "the filters"].filter(Boolean).join(" and ");
+  const inPeriod = period === "all" ? "" : ` ${periodLabel}`;
+
+  /** The current page's URL without one filter (or all of them), for the chips' remove links. */
+  const hrefWithout = (keys: readonly string[]) => {
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(query)) {
+      if (typeof value === "string" && !keys.includes(key)) params.set(key, value);
+    }
+    const text = params.toString();
+    return `/venues/${venue.id}/changelog${text ? `?${text}` : ""}`;
+  };
 
   return (
     <>
@@ -99,26 +141,71 @@ async function Changelog({
           All edits across {venueLabel === "all venues" ? "all venues'" : `${venueLabel}'s`} events, newest first ·{" "}
           {/* Announced as the results change, e.g. while searching. */}
           <span role="status">
-            {search
-              ? `${count} ${rows.length === 1 ? "matches" : "match"} “${search}”${period === "all" ? "" : ` ${periodLabel}`}`
-              : `${count} ${when}`}
+            {narrowing ? `${count} ${rows.length === 1 ? "matches" : "match"} ${narrowing}${inPeriod}` : `${count} ${when}`}
           </span>
         </p>
+        {/* As in the prototype: issue this venue's archive early (Supervisor, F&B Manager), or open it once issued. */}
+        {canGenerateArchive(user.role) && (
+          <div className={styles.archiveAction}>
+            {thisMonthArchive ? (
+              <Link href={`/venues/${venue.id}/archive/${thisMonthArchive.ref}`} className="btn btn-secondary btn-sm">
+                Open this month&apos;s archive
+              </Link>
+            ) : (
+              <GenerateEarly
+                venueId={venue.id}
+                label="Generate this month's archive early"
+                {...earlyArchiveWording(today)}
+              />
+            )}
+            <span className={styles.archiveHint}>
+              {thisMonthArchive
+                ? `Generated ${formatDayShort(thisMonthArchive.generatedAt.slice(0, 10))} · ${thisMonthArchive.generatedAt.slice(11, 16)}`
+                : `Full archive issues ${earlyArchiveWording(today).issueDay}`}
+            </span>
+          </div>
+        )}
       </div>
 
       <ChangelogControls
         search={search}
         period={period}
         venue={multiVenue ? venueChoice : null}
-        venues={available.map((v) => ({ id: v.id, name: v.name }))}
+        // Unavailable venues are listed but can't be chosen, as in the prototype.
+        venues={VENUES.map((v) => ({ id: v.id, name: v.name, available: v.available }))}
+        filters={filters}
+        options={options}
       />
+
+      {activeFilters.length > 0 && (
+        <ul className={styles.chips} aria-label="Active filters">
+          {activeFilters.map((key) => (
+            <li key={key}>
+              <Link
+                href={hrefWithout([key])}
+                scroll={false}
+                className={styles.chip}
+                aria-label={`Remove filter ${FILTER_LABELS[key]}: ${options[key].find((o) => o.value === filters[key])!.label}`}
+              >
+                {FILTER_LABELS[key]}: {options[key].find((o) => o.value === filters[key])!.label}
+                <span aria-hidden="true"> ✕</span>
+              </Link>
+            </li>
+          ))}
+          {activeFilters.length > 1 && (
+            <li>
+              <Link href={hrefWithout(FILTER_KEYS)} scroll={false} className={styles.clearChips}>
+                Clear filters
+              </Link>
+            </li>
+          )}
+        </ul>
+      )}
 
       {rows.length === 0 ? (
         <p className={styles.empty}>
-          {search
-            ? period === "all"
-              ? `No entries match “${search}”.`
-              : `No entries match “${search}” ${periodLabel}. Try a longer period.`
+          {narrowing
+            ? `No entries match ${narrowing}${inPeriod}.${period === "all" ? "" : " Try a longer period."}`
             : period === "all"
               ? "No changes recorded yet."
               : `No changes recorded ${periodLabel}.`}
@@ -154,11 +241,25 @@ async function Changelog({
   );
 }
 
-/** CSS class for a role badge, from the prototype's palette. */
-function roleClass(role: string): string {
-  return { "F&B Manager": "roleManager", Supervisor: "roleSupervisor", Chef: "roleChef", "Allergen Member": "roleMember" }[
-    role
-  ] ?? "roleAutomatic";
+/**
+ * Person, role and event choices from the entries in scope, as in the prototype.
+ * Roles follow the usual order; events are listed by name (with the venue when
+ * showing all venues) but chosen by id, so two events with one name stay apart.
+ */
+function filterOptions(rows: readonly Row[], showVenue: boolean): FilterOptions {
+  const byLabel = (a: FilterOption, b: FilterOption) => a.label.localeCompare(b.label, "en-GB");
+  const unique = (values: string[]) => [...new Set(values)].map((value) => ({ value, label: value }));
+  const roleOrder = [...ROLES, "Automatic"] as string[];
+  const events = new Map<string, FilterOption>();
+  for (const row of rows) {
+    const venueName = VENUES.find((v) => v.id === row.venueId)!.name;
+    events.set(row.eventId, { value: row.eventId, label: showVenue ? `${row.eventName} · ${venueName}` : row.eventName });
+  }
+  return {
+    person: unique(rows.map((r) => r.name)).sort(byLabel),
+    role: unique(rows.map((r) => r.role)).sort((a, b) => roleOrder.indexOf(a.value) - roleOrder.indexOf(b.value)),
+    event: [...events.values()].sort(byLabel),
+  };
 }
 
 function ChangelogLoading() {

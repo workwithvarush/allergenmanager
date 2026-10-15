@@ -4,12 +4,15 @@
  * the prototype's standard menus. Completed dishes carry the allergens and
  * tags recorded on their menu.
  */
-import { makeLogEntry, type LogActor, type LogEntry } from "@/lib/changelog";
+import type { ArchiveRecord } from "@/lib/archives";
+import { makeLogEntry, venueNow, type LogActor, type LogEntry } from "@/lib/changelog";
 import { addDays } from "@/lib/dates";
 import type { AllergenEvent, Dish } from "@/lib/events";
-import { findMenu, instantiateMenu } from "@/lib/menus";
+import { findMenu, instantiateMenu, STANDARD_MENUS, type StandardMenu } from "@/lib/menus";
+import { ROLES, type Role } from "@/lib/roles";
+import type { StaffMember } from "@/lib/staff";
 import { venueDate } from "@/lib/venue-time";
-import type { VenueId } from "@/lib/venues";
+import { usesStandardMenus, type VenueId } from "@/lib/venues";
 
 /** A standard menu's dishes; the first `completeCount` are complete, with the menu's recorded allergens. */
 function dishes(menuId: string, completeCount: number): Dish[] {
@@ -49,7 +52,12 @@ const PEOPLE = {
 function seedLog(event: Omit<AllergenEvent, "log">, today: string): LogEntry[] {
   // Changes happen on the day of the event, or today for events still to come.
   const day = event.date < today ? event.date : today;
-  const at = (date: string, time: string) => `${date}T${time}`;
+  // Never later than now: early in the morning, today's sample times haven't happened yet, so they move to yesterday.
+  const now = venueNow();
+  const at = (date: string, time: string) => {
+    const stamp = `${date}T${time}`;
+    return stamp > now ? `${addDays(date, -1)}T${time}` : stamp;
+  };
   const menu = event.menuId ? `Menu ${event.menuId} assigned` : `${event.menuName} · ${event.dishes.length} dishes to configure`;
   const log = [makeLogEntry(PEOPLE.sam, "edit", `Event created — ${menu}`, at(addDays(day, -2), "16:30"))];
   const complete = event.dishes.filter((d) => d.complete);
@@ -227,6 +235,8 @@ function allEvents(venueId: VenueId): AllergenEvent[] {
       flagged,
       lastModifiedAt: seed.lastPrintedAt ?? "09:00",
       customMessage: "",
+      // Events keep the menu's name from when they took it on.
+      menuName: seed.menuName ?? (seed.menuId ? (findMenu(seed.menuId)?.name ?? null) : null),
     };
     return { ...event, log: seedLog(event, today) };
   });
@@ -251,4 +261,107 @@ function allEvents(venueId: VenueId): AllergenEvent[] {
 /** Sample events running on `date`. */
 export function getEventsForDay(venueId: VenueId, date: string): Promise<AllergenEvent[]> {
   return getEventsBetween(venueId, date, date);
+}
+
+/**
+ * Archives generated in the app, held in server memory like events (none are
+ * seeded, as in the prototype). Replace with a database table.
+ */
+const savedArchives: ArchiveRecord[] = ((globalThis as { __demoArchives?: ArchiveRecord[] }).__demoArchives ??= []);
+
+/** The venue's archives, newest month first; for one month, the latest generated first. */
+export async function getArchives(venueId: VenueId): Promise<ArchiveRecord[]> {
+  return savedArchives
+    .filter((a) => a.venueId === venueId)
+    .sort((a, b) => b.month.localeCompare(a.month) || b.generatedAt.localeCompare(a.generatedAt))
+    .map((a) => structuredClone(a));
+}
+
+/** Stores a generated archive. Archives are never changed after this. */
+export async function saveArchive(archive: ArchiveRecord): Promise<void> {
+  savedArchives.push(structuredClone(archive));
+}
+
+/**
+ * Which post-print alerts each person has seen, by "email|venue": opening the
+ * bell marks the ones listed as seen. Held in server memory. Replace with a table.
+ */
+const seenAlerts: Map<string, Set<string>> = ((globalThis as { __demoSeenAlerts?: Map<string, Set<string>> })
+  .__demoSeenAlerts ??= new Map());
+
+export async function getSeenAlerts(email: string, venueId: VenueId): Promise<Set<string>> {
+  return new Set(seenAlerts.get(`${email}|${venueId}`));
+}
+
+export async function markAlertsSeen(email: string, venueId: VenueId, ids: readonly string[]): Promise<void> {
+  const key = `${email}|${venueId}`;
+  seenAlerts.set(key, new Set([...(seenAlerts.get(key) ?? []), ...ids]));
+}
+
+/**
+ * Standard menus as edited in the menu editor, by venue. A venue with no saved
+ * menus uses the built-in ones (EMCC's); venues that build menus per event
+ * (Bramleys) have none. Held in server memory. Replace with a table.
+ */
+const savedMenus: Map<VenueId, StandardMenu[]> = ((globalThis as { __demoMenus?: Map<VenueId, StandardMenu[]> })
+  .__demoMenus ??= new Map());
+
+export async function getMenus(venueId: VenueId): Promise<StandardMenu[]> {
+  if (!usesStandardMenus(venueId)) return [];
+  return structuredClone(savedMenus.get(venueId) ?? (STANDARD_MENUS as readonly StandardMenu[]).map((m) => ({ ...m })));
+}
+
+export async function saveMenus(venueId: VenueId, menus: readonly StandardMenu[]): Promise<void> {
+  savedMenus.set(venueId, structuredClone([...menus]));
+}
+
+/**
+ * Staff accounts as managed on the staff page, shared by every venue. Seeded
+ * with the sample people from the change logs. Held in server memory. Replace
+ * with the real user directory once authentication is decided.
+ */
+let savedStaff: StaffMember[] | undefined = (globalThis as { __demoStaff?: StaffMember[] }).__demoStaff;
+
+function seedStaff(): StaffMember[] {
+  const today = venueDate(new Date());
+  const added = (days: number, by = "Priya Nair") => ({ at: `${addDays(today, -days)}T09:30`, by, text: "Account added" });
+  const member = (id: string, name: string, email: string, role: Role, days: number, extra: Partial<StaffMember> = {}) => ({
+    id,
+    name,
+    email,
+    role,
+    disabled: false,
+    history: [added(days)],
+    ...extra,
+  });
+  return [
+    member("s-priya", PEOPLE.priya.name, PEOPLE.priya.email, "F&B Manager", 400, { history: [added(400, "System")] }),
+    // The demo session user (lib/session.ts), with the same role.
+    member(
+      "s-jamie",
+      "Jamie Baker",
+      "jamie.baker@nottinghamvenues.com",
+      ROLES.find((r) => r === process.env.DEMO_ROLE) ?? "Supervisor",
+      210,
+    ),
+    member("s-sam", PEOPLE.sam.name, PEOPLE.sam.email, "Supervisor", 180),
+    member("s-ellis", PEOPLE.ellis.name, PEOPLE.ellis.email, "Allergen Member", 90),
+    member("s-tom", "Tom Hale", "t.hale@nottinghamvenues.com", "Chef", 150, {
+      history: [added(150), { at: `${addDays(today, -20)}T11:05`, by: "Priya Nair", text: "Role changed from Allergen Member to Chef" }],
+    }),
+    member("s-amara", "Amara Osei", "a.osei@nottinghamvenues.com", "Chef", 60),
+    member("s-lewis", "Lewis Grant", "l.grant@nottinghamvenues.com", "Chef", 300, {
+      disabled: true,
+      history: [added(300), { at: `${addDays(today, -45)}T17:20`, by: "Priya Nair", text: "Account disabled" }],
+    }),
+  ];
+}
+
+export async function getStaff(): Promise<StaffMember[]> {
+  savedStaff ??= (globalThis as { __demoStaff?: StaffMember[] }).__demoStaff = seedStaff();
+  return structuredClone(savedStaff);
+}
+
+export async function saveStaff(staff: readonly StaffMember[]): Promise<void> {
+  savedStaff = (globalThis as { __demoStaff?: StaffMember[] }).__demoStaff = structuredClone([...staff]);
 }

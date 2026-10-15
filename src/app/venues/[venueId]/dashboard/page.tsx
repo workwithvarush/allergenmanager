@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { LoadingPlaceholder, Skeleton } from "@/components/Skeleton";
-import { getEventsForDay } from "@/lib/demo-data";
+import { getEventsForDay, getMenus } from "@/lib/demo-data";
+import { activeMenus } from "@/lib/menus";
 import { sortByServiceTime } from "@/lib/events";
 import { canSeeAllVenues } from "@/lib/permissions";
 import { getSessionUser } from "@/lib/session";
@@ -54,6 +55,7 @@ async function TodaysEvents({ params }: { params: Promise<{ venueId: string }> }
     <>
       <DashboardVenueSwitcher role={user.role} venueId={venueId} />
       <Dashboard
+        menus={activeMenus(await getMenus(venueId))}
         venueId={venueId}
         role={user.role}
         today={today}

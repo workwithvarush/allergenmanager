@@ -13,7 +13,7 @@ import {
   timeToService,
   type AllergenEvent,
 } from "@/lib/events";
-import { STANDARD_MENUS, type StandardMenu } from "@/lib/menus";
+import type { StandardMenu } from "@/lib/menus";
 import { canFlagForReprint } from "@/lib/permissions";
 import type { Role } from "@/lib/roles";
 import { ChangeMenuDialog } from "../ChangeMenuDialog";
@@ -27,10 +27,12 @@ type EventDetailProps = {
   now: string | null;
   onChangeMenu: (menu: StandardMenu) => void;
   onToggleFlag: () => void;
+  /** The venue's menus that can be switched to (not retired). */
+  menus: readonly StandardMenu[];
 };
 
 /** The selected event: status, progress, assigned menu and actions — as in the prototype's dashboard. */
-export function EventDetail({ event, venueId, role, now, onChangeMenu, onToggleFlag }: EventDetailProps) {
+export function EventDetail({ event, venueId, role, now, onChangeMenu, onToggleFlag, menus }: EventDetailProps) {
   const [pendingMenu, setPendingMenu] = useState<StandardMenu | null>(null);
 
   const lane = eventLane(event);
@@ -85,7 +87,7 @@ export function EventDetail({ event, venueId, role, now, onChangeMenu, onToggleF
         <>
           <fieldset className={styles.menus}>
             <legend className={styles.sectionLabel}>Assigned menu</legend>
-            {STANDARD_MENUS.map((menu) => {
+            {menus.map((menu) => {
               const current = menu.id === event.menuId;
               return (
                 <button
@@ -157,6 +159,7 @@ export function EventDetail({ event, venueId, role, now, onChangeMenu, onToggleF
       {pendingMenu && (
         <ChangeMenuDialog
           event={event}
+          menus={menus}
           initialMenuId={pendingMenu.id}
           onCancel={() => setPendingMenu(null)}
           onConfirm={(menu) => {

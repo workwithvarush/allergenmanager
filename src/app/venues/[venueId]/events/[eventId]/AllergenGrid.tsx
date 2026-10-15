@@ -21,6 +21,8 @@ type AllergenGridProps = {
   onCycle: (allergen: AllergenId) => void;
   /** Opens the note editor for an allergen. */
   onEditNote: (allergen: AllergenId) => void;
+  /** Mark this grid (and its first pencil) for the guided tour — the first dish's. */
+  tour?: boolean;
 };
 
 /** Selector for one cell, so focus can be returned to it (e.g. after the note editor closes). */
@@ -34,7 +36,7 @@ export function cellSelector(dishId: string, allergen: AllergenId): string {
  * cell) adds an ingredient note. The grid is one Tab stop; arrow keys move
  * between cells, Space or Enter cycles.
  */
-export function AllergenGrid({ dish, dishLabel, onCycle, onEditNote }: AllergenGridProps) {
+export function AllergenGrid({ dish, dishLabel, onCycle, onEditNote, tour = false }: AllergenGridProps) {
   const [active, setActive] = useState(0);
   const [announcement, setAnnouncement] = useState("");
   const gridRef = useRef<HTMLDivElement>(null);
@@ -74,7 +76,7 @@ export function AllergenGrid({ dish, dishLabel, onCycle, onEditNote }: AllergenG
 
   return (
     <>
-      <div ref={gridRef} role="group" aria-label={`${dishLabel} allergens`} className={styles.grid} onKeyDown={onKeyDown}>
+      <div ref={gridRef} role="group" aria-label={`${dishLabel} allergens`} className={styles.grid} onKeyDown={onKeyDown} data-tour={tour ? "allergen-grid" : undefined}>
         {ALLERGENS.map(({ id, label }, i) => {
           const mark = dish.allergens[id];
           const note = dish.notes[id];
@@ -106,6 +108,7 @@ export function AllergenGrid({ dish, dishLabel, onCycle, onEditNote }: AllergenG
               <button
                 type="button"
                 className={`${styles.pencil} ${note ? styles.pencilNoted : ""}`}
+                data-tour={tour && i === 0 ? "cell-note" : undefined}
                 tabIndex={-1}
                 aria-label={`${note ? "Edit" : "Add"} ${label} note`}
                 title={note ? `${label} note: ${note}` : `Add an ingredient note to ${label}`}

@@ -67,7 +67,7 @@ async function PrintLoader({ params }: { params: Promise<{ venueId: string; even
             <Link href={entryHref} className="btn btn-secondary">
               Edit allergens
             </Link>
-            <PrintButton blocked={blocked} />
+            <PrintButton blocked={blocked} tour="print-now" />
           </div>
         </div>
         {blocked && (

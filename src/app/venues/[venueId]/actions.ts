@@ -2,9 +2,9 @@
 
 import { refresh } from "next/cache";
 import { makeLogEntry } from "@/lib/changelog";
-import { getEventsForDay, saveEvent } from "@/lib/demo-data";
+import { getEventsForDay, getMenus, saveEvent } from "@/lib/demo-data";
 import type { AllergenEvent, Dish } from "@/lib/events";
-import { findMenu, instantiateMenu } from "@/lib/menus";
+import { activeMenus, instantiateMenu } from "@/lib/menus";
 import { validateNewEvent, type NewEventErrors, type NewEventInput } from "@/lib/new-event";
 import { canCreateCustomMenu, canCreateEvents } from "@/lib/permissions";
 import { getSessionUser } from "@/lib/session";
@@ -35,7 +35,12 @@ export async function createEvent(venueId: string, input: NewEventInput): Promis
   }
 
   const standardMenus = usesStandardMenus(venue.id);
-  const errors = validateNewEvent(input, { standardMenus, today: venueDate(new Date()) });
+  const menus = activeMenus(await getMenus(venue.id));
+  const errors = validateNewEvent(input, {
+    standardMenus,
+    today: venueDate(new Date()),
+    menuIds: menus.map((m) => m.id),
+  });
   const custom = !standardMenus || input.menu === "custom";
   if (custom && standardMenus && !canCreateCustomMenu(user.role)) {
     errors.menu = "Only supervisors and F&B managers can create custom menus";
@@ -50,7 +55,7 @@ export async function createEvent(venueId: string, input: NewEventInput): Promis
   }
   if (Object.keys(errors).length > 0) return { ok: false, errors };
 
-  const menu = custom ? undefined : findMenu(input.menu);
+  const menu = custom ? undefined : menus.find((m) => m.id === input.menu);
   const dishes: Dish[] = menu
     ? instantiateMenu(menu)
     : Array.from({ length: Number(input.numDishes) }, (_, i) => ({
@@ -74,7 +79,8 @@ export async function createEvent(venueId: string, input: NewEventInput): Promis
     time: input.time,
     guests: Number(input.guests),
     menuId: menu ? menu.id : null,
-    menuName: menu ? null : input.customName.trim() || "Custom menu",
+    // The menu's name now; renaming the menu later doesn't relabel this event.
+    menuName: menu ? menu.name : input.customName.trim() || "Custom menu",
     dishes,
     version: 1,
     lastPrintedAt: null,

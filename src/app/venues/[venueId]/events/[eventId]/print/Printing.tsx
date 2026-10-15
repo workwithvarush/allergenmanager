@@ -11,15 +11,18 @@ type PrintButtonProps = {
   /** Why the event can't print yet (e.g. incomplete dishes), or null. */
   blocked: string | null;
   className?: string;
+  /** data-tour target for the guided tour. */
+  tour?: string;
 };
 
 /** "Print all 3 documents" — gold, as the design system reserves gold for printing. */
-export function PrintButton({ blocked, className }: PrintButtonProps) {
+export function PrintButton({ blocked, className, tour }: PrintButtonProps) {
   const { print, printing } = usePrinting();
   return (
     <Button
       variant="gold"
       className={className}
+      data-tour={tour}
       // aria-disabled keeps it focusable so the reason can be heard.
       aria-disabled={blocked ? true : undefined}
       aria-describedby={blocked ? "print-blocked" : undefined}

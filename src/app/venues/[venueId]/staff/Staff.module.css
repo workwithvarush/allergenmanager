@@ -1,0 +1,284 @@
+/* Staff accounts — follows the archive and menu screens */
+
+.screen {
+  width: 100%;
+  padding: 24px 28px 32px;
+}
+
+.header {
+  margin-bottom: 18px;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--text-2xl);
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.3px;
+  line-height: 1.15;
+  color: var(--fg-1);
+}
+
+.sub {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--fg-4);
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin-bottom: 12px;
+}
+
+.search {
+  flex: 0 1 280px;
+  min-width: 200px;
+}
+
+.add {
+  margin-left: auto;
+}
+
+.notice:not(:empty) {
+  margin-bottom: 12px;
+}
+
+.empty {
+  padding: 32px 16px;
+  margin: 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--fg-4);
+  background: var(--white);
+  border: 1px solid var(--neutral-200);
+  border-radius: 8px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--white);
+  border: 1px solid var(--neutral-200);
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  font-size: 13px;
+}
+
+.table thead th {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--neutral-200);
+  font-size: 11px;
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.4px;
+  text-align: left;
+  text-transform: uppercase;
+  color: var(--fg-4);
+}
+
+.table td,
+.table tbody th {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--neutral-200);
+  vertical-align: middle;
+  text-align: left;
+  font-weight: inherit;
+}
+
+.table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.person {
+  min-width: 200px;
+}
+
+.name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: var(--fw-semibold);
+  color: var(--fg-1);
+}
+
+.email {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--fg-4);
+  overflow-wrap: anywhere;
+}
+
+.you,
+.disabledBadge {
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: var(--fw-semibold);
+}
+
+.you {
+  background: var(--brand-forest-faint);
+  color: var(--brand-forest);
+}
+
+.disabledBadge {
+  background: var(--neutral-200);
+  color: var(--fg-3);
+}
+
+.disabledRow .name,
+.disabledRow .role {
+  color: var(--fg-4);
+}
+
+.role {
+  white-space: nowrap;
+  color: var(--fg-2);
+}
+
+.last {
+  color: var(--fg-3);
+}
+
+.lastMeta {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--fg-4);
+}
+
+.actions {
+  white-space: nowrap;
+  text-align: right !important;
+}
+
+.actions > * + * {
+  margin-left: 6px;
+}
+
+.selfNote {
+  display: inline-block;
+  max-width: 180px;
+  white-space: normal;
+  font-size: 11px;
+  color: var(--fg-4);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.roleOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.roleOption {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--neutral-200);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.roleOption:has(input:checked) {
+  border-color: var(--brand-forest);
+  background: var(--brand-forest-faint);
+}
+
+.roleOption input {
+  margin-top: 3px;
+  accent-color: var(--brand-forest);
+}
+
+.roleName {
+  display: block;
+  font-size: 14px;
+  font-weight: var(--fw-semibold);
+  color: var(--fg-1);
+}
+
+.current {
+  font-weight: normal;
+  color: var(--fg-4);
+}
+
+.roleSummary {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--fg-3);
+}
+
+.roleOptions + * {
+  margin-top: 12px;
+}
+
+.dialogText {
+  margin: 0 0 12px;
+}
+
+@media (max-width: 760px) {
+  .screen {
+    padding: 18px 16px 28px;
+  }
+
+  .search {
+    flex: 1 1 100%;
+  }
+
+  .add {
+    margin-left: 0;
+  }
+
+  /* One card per person. */
+  .table,
+  .table tbody,
+  .table tr,
+  .table td,
+  .table tbody th {
+    display: block;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table tr {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--neutral-200);
+  }
+
+  .table tbody tr:last-child {
+    border-bottom: 0;
+  }
+
+  .table td,
+  .table tbody th {
+    padding: 0;
+    border: 0;
+  }
+
+  .role,
+  .last {
+    margin-top: 6px;
+  }
+
+  .actions {
+    margin-top: 10px;
+    text-align: left !important;
+  }
+}

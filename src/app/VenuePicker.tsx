@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { NottinghamVenuesLogo } from "@/components/NottinghamVenuesLogo";
 import type { Venue } from "@/lib/venues";
-import { LoginDialog } from "./LoginDialog";
+import { checkLogin } from "./actions";
+import { LoginDialog, type LoginDetails } from "./LoginDialog";
 import styles from "./VenuePicker.module.css";
 
 export function VenuePicker({ venues }: { venues: readonly Venue[] }) {
@@ -21,8 +22,13 @@ export function VenuePicker({ venues }: { venues: readonly Venue[] }) {
   };
 
   // Placeholder until authentication is decided: the details aren't kept yet (see lib/session.ts).
-  const logIn = () => {
+  const logIn = async ({ email }: LoginDetails) => {
     if (!venue) return;
+    const result = await checkLogin(email).catch(() => ({
+      ok: false as const,
+      message: "Couldn't reach the server. Check your connection and try again.",
+    }));
+    if (!result.ok) throw new Error(result.message);
     setLoginOpen(false);
     router.push(`/venues/${venue.id}/dashboard`);
   };

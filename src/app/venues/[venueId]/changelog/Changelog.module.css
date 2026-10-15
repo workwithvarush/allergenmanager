@@ -6,7 +6,27 @@
 }
 
 .header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px 20px;
   margin-bottom: 16px;
+}
+
+/* "Generate this month's archive early" with its hint underneath (prototype) */
+.archiveAction {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.archiveHint {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  white-space: nowrap;
+  color: var(--fg-4);
 }
 
 .title {
@@ -226,4 +246,128 @@
 
 .searchInput::placeholder {
   color: var(--fg-4);
+}
+
+/* Filters button and pop-over — prototype values */
+
+.filters {
+  position: relative;
+}
+
+.filtersButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: var(--fw-medium);
+  white-space: nowrap;
+  color: var(--neutral-800);
+  background: var(--white);
+  border: 1px solid var(--neutral-300);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.filtersButton:hover {
+  background: var(--neutral-50);
+  border-color: var(--neutral-400);
+}
+
+.filtersButton[aria-expanded="true"] {
+  border-color: var(--brand-forest);
+}
+
+.filtersCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  font-size: 10px;
+  font-weight: var(--fw-semibold);
+  color: var(--white);
+  background: var(--brand-forest);
+  border-radius: 8px;
+}
+
+.filtersPanel {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 236px;
+  padding: 14px;
+  background: var(--white);
+  border: 1px solid var(--neutral-200);
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+}
+
+.filterField {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.filterField .select {
+  width: 100%;
+  font-weight: var(--fw-regular);
+}
+
+.filtersFoot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--neutral-100);
+}
+
+/* Active filter chips under the toolbar */
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: -4px 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px 10px;
+  font-size: 11.5px;
+  font-weight: var(--fw-medium);
+  color: var(--brand-forest);
+  text-decoration: none;
+  background: var(--brand-forest-faint);
+  border: 1px solid var(--brand-forest-border);
+  border-radius: var(--radius-pill);
+}
+
+.chip:hover {
+  color: var(--brand-forest);
+  border-color: var(--brand-forest);
+}
+
+.clearChips {
+  margin-left: 4px;
+  font-size: 11.5px;
+  color: var(--fg-3);
+}
+
+@media (max-width: 640px) {
+  .filtersPanel {
+    right: auto;
+    left: 0;
+  }
 }

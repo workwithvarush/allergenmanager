@@ -74,7 +74,7 @@ export function PrintPreview({ documents, sheetTools }: PrintPreviewProps) {
 
   return (
     <>
-      <div className={styles.tabs} data-print-hide role="tablist" aria-label="Documents" onKeyDown={onKeyDown}>
+      <div className={styles.tabs} data-print-hide data-tour="preview-tabs" role="tablist" aria-label="Documents" onKeyDown={onKeyDown}>
         {DOCUMENTS.map((doc) => (
           <button
             key={doc.id}

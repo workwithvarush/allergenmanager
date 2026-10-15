@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { LogOutDialog } from "@/components/LogOutDialog";
 import { NottinghamVenuesLogo } from "@/components/NottinghamVenuesLogo";
 
-export type NavItem = { href: string; label: string };
+/** `tour`: data-tour target for the guided tour. */
+export type NavItem = { href: string; label: string; tour?: string };
 
 export type HeaderUser = { name: string; role: string };
 
@@ -20,6 +21,8 @@ type AppHeaderProps = {
   user: HeaderUser;
   /** Runs after the user confirms "Log out of {venue}?". */
   onLogOut: () => void;
+  /** Extra controls between the nav and the user, e.g. the notifications bell. */
+  tools?: ReactNode;
 };
 
 function initials(name: string): string {
@@ -32,7 +35,7 @@ function initials(name: string): string {
  * App top bar: logo and venue, page nav, signed-in user and log out
  * (`.topnav-*` in kit.css). Log out asks for confirmation first.
  */
-export function AppHeader({ venueName, homeHref = "/", nav, user, onLogOut }: AppHeaderProps) {
+export function AppHeader({ venueName, homeHref = "/", nav, user, onLogOut, tools }: AppHeaderProps) {
   const pathname = usePathname();
   const isCurrent = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
   const [confirmingLogOut, setConfirmingLogOut] = useState(false);
@@ -50,12 +53,14 @@ export function AppHeader({ venueName, homeHref = "/", nav, user, onLogOut }: Ap
               key={item.href}
               href={item.href}
               className="topnav-tab"
+              data-tour={item.tour}
               aria-current={isCurrent(item.href) ? "page" : undefined}
             >
               {item.label}
             </Link>
           ))}
         </nav>
+        {tools}
         <div className="topnav-user">
           <span className="topnav-avatar" aria-hidden="true">
             {initials(user.name)}

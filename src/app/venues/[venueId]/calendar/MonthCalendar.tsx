@@ -7,6 +7,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { addDays, addMonths, daysOfMonth, formatMonth, isIsoDate, monthOf, weekdayIndex } from "@/lib/dates";
 import { eventDateLabel, eventLane, eventOnDay, menuLabel, type AllergenEvent } from "@/lib/events";
 import { formatDayLong } from "@/lib/venue-time";
+import type { StandardMenu } from "@/lib/menus";
 import { NewEventDialog } from "../NewEventDialog";
 import styles from "./Calendar.module.css";
 
@@ -31,6 +32,8 @@ type MonthCalendarProps = {
   standardMenus: boolean;
   /** Whether new events can use a custom menu instead of a standard one. */
   canCustomMenu: boolean;
+  /** The venue's menus that can be chosen (not retired). */
+  menus: StandardMenu[];
 };
 
 /** Month grid beside the selected day's events, as in the prototype's calendar. */
@@ -43,6 +46,7 @@ export function MonthCalendar({
   canCreate,
   standardMenus,
   canCustomMenu,
+  menus,
 }: MonthCalendarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -232,6 +236,7 @@ export function MonthCalendar({
 
       {creating && (
         <NewEventDialog
+          menus={menus}
           venueId={venueId}
           defaultDate={selected}
           today={today}
