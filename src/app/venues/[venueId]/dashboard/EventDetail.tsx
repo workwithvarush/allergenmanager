@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/Button";
-import { Dialog } from "@/components/Dialog";
 import { ProgressBar } from "@/components/ProgressBar";
 import { StatusBadge } from "@/components/StatusBadge";
 import {
@@ -17,6 +16,7 @@ import {
 import { STANDARD_MENUS, type StandardMenu } from "@/lib/menus";
 import { canFlagForReprint } from "@/lib/permissions";
 import type { Role } from "@/lib/roles";
+import { ChangeMenuDialog } from "../ChangeMenuDialog";
 import styles from "./EventDetail.module.css";
 
 type EventDetailProps = {
@@ -48,8 +48,6 @@ export function EventDetail({ event, venueId, role, now, onChangeMenu, onToggleF
     else onChangeMenu(menu);
   };
 
-  const entered = dishesWithEntries(event);
-
   return (
     <section className={styles.panel} aria-labelledby={`${event.id}-title`}>
       <div className={styles.head}>
@@ -68,7 +66,7 @@ export function EventDetail({ event, venueId, role, now, onChangeMenu, onToggleF
         <ProgressBar
           value={done}
           max={total}
-          label={`${done} of ${total} dishes completed`}
+          label={`${done} of ${total} ${total === 1 ? "dish" : "dishes"} completed`}
           detail={`v${event.version} · edited ${event.lastModifiedAt}`}
         />
       </div>
@@ -156,41 +154,17 @@ export function EventDetail({ event, venueId, role, now, onChangeMenu, onToggleF
         </p>
       )}
 
-      <Dialog
-        open={pendingMenu !== null}
-        onClose={() => setPendingMenu(null)}
-        title={pendingMenu ? `Switch ${event.name} to ${pendingMenu.name}?` : ""}
-        footer={
-          <>
-            <Button variant="secondary" onClick={() => setPendingMenu(null)} data-autofocus>
-              Keep current menu
-            </Button>
-            <Button
-              variant="danger"
-              onClick={() => {
-                if (pendingMenu) onChangeMenu(pendingMenu);
-                setPendingMenu(null);
-              }}
-            >
-              Replace dish list
-            </Button>
-          </>
-        }
-      >
-        {pendingMenu && (
-          <>
-            <p className="t-body" style={{ margin: 0, color: "var(--fg-3)", lineHeight: 1.55 }}>
-              The current dish list will be replaced with the {pendingMenu.name} dish list.
-            </p>
-            <div className="banner banner-warn">
-              <div className="banner-body">
-                {entered} {entered === 1 ? "dish already has" : "dishes already have"} allergen entry. That work
-                will be discarded and cannot be recovered.
-              </div>
-            </div>
-          </>
-        )}
-      </Dialog>
+      {pendingMenu && (
+        <ChangeMenuDialog
+          event={event}
+          initialMenuId={pendingMenu.id}
+          onCancel={() => setPendingMenu(null)}
+          onConfirm={(menu) => {
+            onChangeMenu(menu);
+            setPendingMenu(null);
+          }}
+        />
+      )}
     </section>
   );
 }

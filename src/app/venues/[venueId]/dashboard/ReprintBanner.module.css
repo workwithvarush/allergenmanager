@@ -1,0 +1,38 @@
+/* "Needs reprinting" banner — values from the prototype */
+
+.wrap {
+  margin-bottom: 16px;
+}
+
+.banner {
+  align-items: center;
+  gap: 14px;
+  border-left: 4px solid var(--color-warning);
+  border-radius: var(--radius-lg);
+}
+
+.banner :global(.banner-icon) {
+  margin-top: 0;
+}
+
+/* Narrow screens: the button drops below the text instead of squeezing it. */
+@media (max-width: 560px) {
+  .banner {
+    flex-wrap: wrap;
+  }
+
+  .banner :global(.banner-body) {
+    flex-basis: calc(100% - 30px);
+  }
+
+  .banner :global(.banner-action) {
+    margin-left: 30px;
+  }
+}
+
+.detail {
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-3);
+}

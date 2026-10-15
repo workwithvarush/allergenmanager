@@ -1,0 +1,558 @@
+/* Allergen entry screen — values from the prototype */
+
+.screen {
+  width: 100%;
+  padding: 24px 28px 32px;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.headerText {
+  min-width: 0;
+}
+
+.back {
+  display: inline-block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: var(--fg-4);
+  text-decoration: none;
+}
+
+.back:hover {
+  color: var(--fg-2);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--text-2xl);
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.3px;
+  line-height: 1.15;
+  color: var(--fg-1);
+}
+
+.meta {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--fg-4);
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.headerActions :global(.btn) {
+  white-space: nowrap;
+}
+
+.version {
+  padding: 3px 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  white-space: nowrap;
+  color: var(--fg-3);
+  background: var(--neutral-100);
+  border: 1px solid var(--neutral-200);
+  border-radius: 4px;
+}
+
+.progress {
+  margin-bottom: 20px;
+}
+
+.banner {
+  margin-bottom: 18px;
+  font-size: 12px;
+}
+
+/* Dish cards */
+
+.dishes {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+}
+
+.dish {
+  /* Scrolled into view clear of the sticky footer (e.g. after "+ Add dish"). */
+  scroll-margin-bottom: 96px;
+  padding: 18px 20px;
+  background: var(--white);
+  border: 1px solid var(--neutral-200);
+  border-radius: 12px;
+}
+
+/* Prototype: empty dishes are dashed and faded; complete ones get a green edge. */
+.empty {
+  background: var(--neutral-50);
+  border-style: dashed;
+  border-color: var(--neutral-300);
+}
+
+.complete {
+  border-color: var(--color-success-border);
+}
+
+.dishHead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.index {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--fg-4);
+  background: var(--neutral-100);
+  border-radius: 50%;
+}
+
+.complete .index {
+  color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.dishTitle {
+  flex: 1;
+  min-width: 0;
+}
+
+.dishName {
+  display: block;
+  width: 100%;
+  padding: 4px 0;
+  overflow: hidden;
+  resize: none;
+  /* Grows with the text where supported; elsewhere it stays one line and scrolls. */
+  field-sizing: content;
+  line-height: 1.35;
+  font: inherit;
+  font-size: 16px;
+  font-weight: var(--fw-semibold);
+  color: var(--fg-1);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid transparent;
+  outline: none;
+}
+
+.dishName:hover {
+  border-bottom-color: var(--neutral-300);
+}
+
+.dishName:focus {
+  border-bottom-color: var(--brand-forest);
+  box-shadow: none;
+}
+
+.dishName::placeholder {
+  color: var(--fg-4);
+  font-weight: var(--fw-medium);
+}
+
+.section {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-4);
+}
+
+.remove {
+  flex-shrink: 0;
+}
+
+/* Allergen grid: 7 columns as in the prototype, fewer where the card is narrow */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  margin: 14px 0 6px;
+}
+
+.cell {
+  position: relative;
+  min-height: 34px;
+  font: inherit;
+  font-size: 10.5px;
+  overflow-wrap: anywhere;
+}
+
+.cell:focus-visible {
+  outline: 2px solid var(--brand-forest);
+  outline-offset: 1px;
+}
+
+.mark {
+  margin-left: 4px;
+  font-weight: var(--fw-semibold);
+}
+
+.gridHint {
+  margin: 0;
+  font-size: 11px;
+  color: var(--fg-4);
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.addDish {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: var(--fw-medium);
+  color: var(--fg-3);
+  background: var(--neutral-50);
+  border: 1px dashed var(--neutral-300);
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.addDish:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.addDish:not(:disabled):hover {
+  color: var(--fg-1);
+  border-color: var(--neutral-400);
+}
+
+/* Sticky footer */
+
+.footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 28px;
+  background: var(--white);
+  border-top: 1px solid var(--neutral-200);
+}
+
+.footerStart {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.footerMeta {
+  font-size: 12px;
+  color: var(--fg-4);
+}
+
+.saveError {
+  font-size: 12px;
+  color: var(--color-danger);
+}
+
+@media (max-width: 640px) {
+  .screen {
+    padding: 20px 16px 28px;
+  }
+
+  .dish {
+    padding: 14px;
+  }
+
+  .dishHead {
+    flex-wrap: wrap;
+  }
+
+  .dishTitle {
+    flex-basis: calc(100% - 40px);
+  }
+
+
+  .footer {
+    flex-wrap: nowrap;
+    gap: 10px;
+    padding: 10px 16px;
+  }
+
+  /* The header already links back; keep the bar to status and print. */
+  .footerBack {
+    display: none;
+  }
+
+  .footerStart {
+    gap: 2px 8px;
+  }
+
+  .footerMeta {
+    font-size: 11px;
+  }
+
+  .footer :global(.btn-gold) {
+    flex-shrink: 0;
+    padding: 7px 12px;
+  }
+}
+
+/* Dietary tags — pill toggles from the prototype */
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 12px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.02em;
+  color: var(--fg-3);
+  background: var(--white);
+  border: 1px solid var(--neutral-300);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+
+.tag:hover {
+  border-color: var(--neutral-400);
+}
+
+.tagOn,
+.tagOn:hover {
+  font-weight: var(--fw-semibold);
+  color: var(--white);
+  background: var(--brand-forest);
+  border-color: var(--brand-forest);
+}
+
+/* A ticked tag that now contradicts a "contains" allergen */
+.tagConflict,
+.tagConflict:hover {
+  color: var(--color-warning);
+  background: var(--color-warning-bg);
+  border-color: var(--color-warning);
+}
+
+.tag[aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.tag:focus-visible {
+  outline: 2px solid var(--brand-forest);
+  outline-offset: 2px;
+}
+
+.tagWarnings {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  color: var(--color-warning);
+}
+
+.tagWarnings li::before {
+  content: "⚠ ";
+}
+
+@media (max-width: 900px) {
+  /* Tags get their own row under the dish name */
+  .tags {
+    order: 1;
+    flex-basis: 100%;
+    padding-left: 40px;
+  }
+}
+
+@media (max-width: 640px) {
+  .tags {
+    padding-left: 0;
+  }
+}
+
+/* Ingredient notes — pencil in each cell's corner, inline editor below the grid (prototype) */
+
+.cellWrap {
+  position: relative;
+  display: flex;
+}
+
+.cellWrap .cell {
+  flex: 1;
+  padding-right: 18px;
+}
+
+/* Beats .allergen-cell.present/.may, as in the prototype: a noted cell gets a forest border. */
+.cell.noted,
+.cell.noted:hover {
+  border-color: var(--brand-forest);
+}
+
+.noteChip {
+  display: block;
+  margin-top: 2px;
+  font-size: 9px;
+  font-weight: var(--fw-semibold);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  color: var(--brand-forest);
+}
+
+.pencil {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  color: var(--neutral-500);
+  background: none;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.pencil:hover {
+  color: var(--brand-forest);
+  background: var(--brand-forest-alpha-8);
+}
+
+.pencilNoted {
+  color: var(--brand-forest);
+}
+
+.noteEditor {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 0 8px;
+  padding: 10px 12px;
+  background: var(--brand-forest-faint);
+  border: 1px solid var(--brand-forest);
+  border-radius: 8px;
+}
+
+.noteLabel {
+  font-size: 11px;
+  font-weight: var(--fw-semibold);
+  white-space: nowrap;
+  color: var(--brand-forest);
+}
+
+.noteInput {
+  flex: 1;
+  min-width: 160px;
+  font-size: 12px;
+}
+
+.noteCancel {
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 12px;
+  color: var(--fg-3);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.noteCancel:hover {
+  color: var(--fg-1);
+}
+
+.noteHint {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--fg-3);
+}
+
+/* The last dish can't be removed; the button stays focusable so its reason can be heard. */
+.remove[aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Mark complete — bottom of the card, right-aligned, as in the prototype */
+
+.dishFoot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px 12px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--neutral-200);
+}
+
+.completeReason {
+  margin: 0;
+  font-size: 12px;
+  color: var(--fg-4);
+}
+
+.completeButton[aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.changeMenu {
+  padding: 0;
+  font: inherit;
+  color: var(--brand-forest);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.changeMenu:hover {
+  color: var(--brand-forest-mid);
+}

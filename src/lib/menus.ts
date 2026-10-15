@@ -102,6 +102,7 @@ export function instantiateMenu(menu: StandardMenu): Dish[] {
     allergens: {},
     tags: [],
     mayContain: "",
+    notes: {},
     complete: false,
   }));
 }

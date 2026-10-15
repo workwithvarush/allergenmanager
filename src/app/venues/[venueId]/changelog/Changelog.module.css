@@ -1,0 +1,229 @@
+/* Change log — values from the prototype */
+
+.screen {
+  width: 100%;
+  padding: 24px 28px 32px;
+}
+
+.header {
+  margin-bottom: 16px;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--text-2xl);
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.3px;
+  line-height: 1.15;
+  color: var(--fg-1);
+}
+
+.sub {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--fg-4);
+}
+
+/* Toolbar */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  background: var(--white);
+  border: 1px solid var(--neutral-200);
+  border-radius: 8px;
+}
+
+.toolbar[aria-busy="true"] + * {
+  opacity: 0.6;
+}
+
+.control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.controlLabel {
+  font-size: 10.5px;
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--fg-4);
+}
+
+.select {
+  padding: 7px 10px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: var(--fw-medium);
+  color: var(--fg-2);
+  background: var(--white);
+  border: 1px solid var(--neutral-300);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* List */
+
+.list {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  list-style: none;
+  background: var(--white);
+  border: 1px solid var(--neutral-200);
+  border-radius: 8px;
+}
+
+.list li + li {
+  border-top: 1px solid var(--neutral-100);
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+  padding: 11px 14px;
+  font-size: 12px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.row:hover {
+  color: inherit;
+  background: var(--neutral-50);
+}
+
+.row:focus-visible {
+  outline: 2px solid var(--brand-forest);
+  outline-offset: -2px;
+}
+
+.dot {
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  margin-top: 6px;
+  border-radius: 50%;
+}
+
+.edit { background: var(--brand-forest); }
+.warn { background: var(--color-warning); }
+.print { background: var(--brand-gold); }
+.neutral { background: var(--neutral-300); }
+
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  line-height: 1.5;
+  color: var(--fg-2);
+}
+
+.person {
+  font-weight: var(--fw-semibold);
+  color: var(--fg-1);
+}
+
+/* Role badges — the prototype's palette */
+.role {
+  flex-shrink: 0;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: var(--fw-semibold);
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  border: 1px solid;
+  border-radius: 4px;
+}
+
+.roleManager { color: var(--white); background: var(--brand-forest); border-color: var(--brand-forest); }
+.roleSupervisor { color: var(--brand-forest); background: var(--brand-forest-pale); border-color: var(--brand-forest-border); }
+.roleChef { color: var(--white); background: var(--brand-forest-light); border-color: var(--brand-forest-light); }
+.roleMember { color: var(--brand-forest-light); background: var(--brand-forest-faint); border-color: var(--neutral-200); }
+.roleAutomatic { color: var(--fg-3); background: var(--neutral-100); border-color: var(--neutral-200); }
+
+.context {
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--fg-4);
+}
+
+.context strong {
+  font-weight: var(--fw-semibold);
+  color: var(--fg-3);
+}
+
+.email {
+  font-family: var(--font-mono);
+}
+
+.time {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  white-space: nowrap;
+  color: var(--fg-4);
+}
+
+.empty {
+  margin: 0;
+  padding: 32px 14px;
+  font-size: 12px;
+  text-align: center;
+  color: var(--fg-4);
+  background: var(--white);
+  border: 1px solid var(--neutral-200);
+  border-radius: 8px;
+}
+
+@media (max-width: 640px) {
+  .screen {
+    padding: 20px 16px 28px;
+  }
+
+  .row {
+    flex-wrap: wrap;
+  }
+
+  .time {
+    order: -1;
+    flex-basis: 100%;
+    padding-left: 19px;
+  }
+}
+
+/* Search — fills the free space at the start of the toolbar (prototype) */
+.search {
+  flex: 1;
+  min-width: 180px;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 7px 10px;
+  font: inherit;
+  font-size: 12px;
+  color: var(--fg-2);
+  background: var(--white);
+  border: 1px solid var(--neutral-300);
+  border-radius: 6px;
+}
+
+.searchInput::placeholder {
+  color: var(--fg-4);
+}

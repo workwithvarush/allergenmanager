@@ -8,6 +8,28 @@
   margin-bottom: 20px;
 }
 
+.headerRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.headerActions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.headerActions :global(.btn) {
+  white-space: nowrap;
+}
+
+.created {
+  margin-bottom: 16px;
+}
+
 .title {
   margin: 0;
   font-size: var(--text-2xl);

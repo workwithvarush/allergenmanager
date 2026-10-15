@@ -1,0 +1,247 @@
+/* Preview & print screen — prototype values */
+
+.screen {
+  width: 100%;
+  padding: 24px 28px 32px;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.back {
+  display: inline-block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: var(--fg-4);
+  text-decoration: none;
+}
+
+.back:hover {
+  color: var(--fg-2);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--text-2xl);
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.3px;
+  line-height: 1.15;
+  color: var(--fg-1);
+}
+
+.meta {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--fg-4);
+}
+
+.headerActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.headerActions :global(.btn) {
+  white-space: nowrap;
+}
+
+.version {
+  padding: 3px 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  white-space: nowrap;
+  color: var(--fg-3);
+  background: var(--neutral-100);
+  border: 1px solid var(--neutral-200);
+  border-radius: 4px;
+}
+
+.banner {
+  margin-bottom: 20px;
+  border-left: 4px solid var(--color-warning);
+}
+
+.previewLabel {
+  margin: 0 0 12px;
+  font-size: 11px;
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+.footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 28px;
+  background: var(--white);
+  border-top: 1px solid var(--neutral-200);
+}
+
+@media (max-width: 640px) {
+  .screen {
+    padding: 20px 16px 28px;
+  }
+
+  .footer {
+    padding: 10px 16px;
+  }
+}
+
+/* Additional message editor, above the sheet preview */
+
+.messageCard {
+  margin-bottom: 16px;
+  padding: 16px 18px;
+  background: var(--white);
+  border: 1px solid var(--neutral-200);
+  border-radius: 12px;
+}
+
+.messageHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+  margin-bottom: 8px;
+}
+
+.messageLabel {
+  font-size: 13px;
+  font-weight: var(--fw-semibold);
+  color: var(--fg-1);
+}
+
+.messageHint {
+  font-size: 11px;
+  color: var(--fg-4);
+}
+
+.messageInput {
+  width: 100%;
+  min-height: 76px;
+  font-size: 13px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.messageFoot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  min-height: 18px;
+  margin-top: 6px;
+}
+
+.messageError {
+  font-size: 12px;
+  color: var(--color-danger);
+}
+
+.messageCount {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--fg-4);
+}
+
+.footerStart {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* "Printed" dialog — prototype values */
+
+.printedEyebrow {
+  color: var(--color-success);
+}
+
+.printedDocs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.printedDoc {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--neutral-200);
+  border-radius: 8px;
+}
+
+.printedIcon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  font-size: 14px;
+  color: var(--brand-forest);
+  background: var(--brand-forest-pale);
+  border-radius: 6px;
+}
+
+.printedDocText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.printedDocTitle {
+  font-size: 13px;
+  font-weight: var(--fw-medium);
+  color: var(--fg-2);
+}
+
+.printedDocMeta {
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-4);
+}
+
+.printedHint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--fg-4);
+}
+
+.linkButton {
+  padding: 0;
+  font: inherit;
+  color: var(--brand-forest);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+@media print {
+  .screen {
+    padding: 0;
+  }
+}

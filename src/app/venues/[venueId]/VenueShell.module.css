@@ -19,7 +19,8 @@
   border: var(--border-default);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-sm);
-  overflow: hidden;
+  /* clip, not hidden: hidden would stop sticky footers (e.g. allergen entry) sticking to the viewport */
+  overflow: clip;
 }
 
 .content {
@@ -34,4 +35,17 @@
 /* Collapse the gap while the offline banner has nothing to show (its live region stays mounted) */
 .offline:not(:has(:global(.banner))) {
   padding: 0;
+}
+
+@media print {
+  .shell {
+    max-width: none;
+    padding: 0;
+  }
+
+  .frame {
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
 }

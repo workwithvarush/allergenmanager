@@ -114,7 +114,7 @@ export function EventList({ visible, noEvents, filter, selectedId, onSelect, now
                 <span className={styles.main}>
                   <span className={styles.name}>{event.name}</span>
                   <span className={styles.meta}>
-                    {event.room} · {event.guests} guests · {done} of {total} dishes · v{event.version}
+                    {event.room} · {event.guests} guests · {done} of {total} {total === 1 ? "dish" : "dishes"} · v{event.version}
                     {event.lastPrintedAt && ` · printed ${event.lastPrintedAt}`}
                   </span>
                   {isChangedSincePrint(event) && (

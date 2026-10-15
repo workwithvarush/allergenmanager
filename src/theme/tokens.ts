@@ -71,6 +71,8 @@ export const colorTokens = {
   "allergen-maycontain-bg": "#FEF6E7",
   "allergen-absent": "#E0E0E0",
   "allergen-absent-bg": "#F8F8F8",
+  // "May contain:" line on printed placecards (prototype)
+  "print-may-contain": "#2563EB",
 
   // ── Dietary tags ─────────────────────────────────────
   "tag-v-text": "#2D5A1E",

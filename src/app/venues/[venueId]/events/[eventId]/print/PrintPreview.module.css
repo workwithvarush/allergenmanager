@@ -1,0 +1,92 @@
+/* Document tabs and the grey "desk" the A4 pages sit on — prototype values */
+
+.tabs {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--neutral-200);
+}
+
+.tab {
+  margin-bottom: -1px;
+  padding: 10px 14px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: var(--fw-medium);
+  color: var(--fg-3);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: var(--fg-1);
+}
+
+.tab[aria-selected="true"] {
+  color: var(--brand-forest);
+  border-bottom-color: var(--brand-forest);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--brand-forest);
+  outline-offset: -2px;
+}
+
+.desk {
+  padding: 24px;
+  overflow: hidden;
+  background: var(--neutral-100);
+  border-radius: 8px;
+}
+
+.pages {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Gap between pages, scaled with them */
+  gap: 32px;
+}
+
+.overflow {
+  margin-bottom: 16px;
+}
+
+.panels {
+  position: relative;
+}
+
+/*
+ * Inactive documents stay laid out (off-screen and invisible) rather than not
+ * rendered, so the sheet can fit itself to A4 and all 3 print from any tab.
+ */
+.panel[hidden] {
+  position: absolute;
+  top: 0;
+  left: -100000px;
+  display: block;
+  width: 100%;
+  visibility: hidden;
+}
+
+@media print {
+  .desk {
+    padding: 0;
+    overflow: visible;
+    background: none;
+    border-radius: 0;
+  }
+
+  /* Plain blocks, not flex: pages start at the paper edge and split cleanly. */
+  .pages {
+    display: block;
+    zoom: 1 !important;
+  }
+
+  /* All 3 documents print, whichever tab is showing. */
+  .panel[hidden] {
+    position: static;
+    visibility: visible;
+  }
+}

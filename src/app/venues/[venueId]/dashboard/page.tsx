@@ -7,7 +7,7 @@ import { getEventsForDay } from "@/lib/demo-data";
 import { sortByServiceTime } from "@/lib/events";
 import { canSeeAllVenues } from "@/lib/permissions";
 import { getSessionUser } from "@/lib/session";
-import { formatDayLong, venueDate } from "@/lib/venue-time";
+import { venueDate } from "@/lib/venue-time";
 import { VENUES } from "@/lib/venues";
 import { DashboardVenueSwitcher } from "./DashboardVenueSwitcher";
 import { Dashboard } from "./Dashboard";
@@ -56,7 +56,7 @@ async function TodaysEvents({ params }: { params: Promise<{ venueId: string }> }
       <Dashboard
         venueId={venueId}
         role={user.role}
-        dayLabel={formatDayLong(today)}
+        today={today}
         initialEvents={sortByServiceTime(events)}
         otherVenueEvents={otherVenueEvents}
       />

@@ -1,0 +1,508 @@
+/* Printed documents at real A4 size — values from the prototype. Shown scaled in the preview. */
+
+.page {
+  position: relative;
+  font-family: var(--font-sans);
+  color: var(--neutral-900);
+  background: var(--white);
+  box-shadow: var(--shadow-md);
+}
+
+/* Content box filling the page; anything past its edges would be cut off on paper. */
+.pageInner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.portrait {
+  width: 210mm;
+  height: 297mm;
+}
+
+.landscape {
+  width: 297mm;
+  height: 210mm;
+}
+
+.page p,
+.page h2,
+.page h3 {
+  margin: 0;
+}
+
+.tags {
+  font-weight: 700;
+  color: var(--brand-forest);
+}
+
+.tagLegend {
+  font-size: 13px;
+  font-weight: 700;
+  white-space: pre-wrap;
+  color: var(--brand-forest);
+}
+
+/* ── Allergen sheet ───────────────────────────────────── */
+
+.sheet {
+  padding: 12mm 10mm;
+}
+
+.sheetHeader {
+  position: relative;
+  margin-bottom: 6mm;
+  padding-bottom: 8mm;
+  text-align: center;
+}
+
+.formal .sheetHeader {
+  border-bottom: 1px solid var(--neutral-300);
+}
+
+.branded .sheetHeader {
+  border-bottom: 2px solid var(--brand-forest);
+}
+
+.sheetLeaf {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  width: 170px;
+  height: auto;
+  pointer-events: none;
+}
+
+.sheetTitle {
+  position: relative;
+}
+
+.formal .sheetTitle {
+  font-family: var(--font-playfair), serif;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.branded .sheetTitle {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: var(--brand-forest);
+}
+
+.pageNumber {
+  margin-top: 2mm;
+  font-size: 10px;
+  color: var(--fg-4);
+}
+
+.matrix {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 9px;
+}
+
+.matrix th,
+.matrix td {
+  border: 1px solid var(--neutral-200);
+}
+
+.formal .matrix th,
+.formal .matrix td {
+  border-color: var(--neutral-900);
+}
+
+.dishHead {
+  width: 16%;
+  padding: 6px;
+  text-align: left;
+  vertical-align: bottom;
+  font-weight: 600;
+}
+
+.formal .dishHead {
+  width: 22%;
+}
+
+.branded .dishHead,
+.branded .allergenHead {
+  color: var(--fg-2);
+  background: var(--neutral-50);
+}
+
+.allergenHead {
+  padding: 4px 1px;
+  vertical-align: bottom;
+}
+
+.allergenHead > * {
+  display: block;
+  margin: 0 auto;
+}
+
+.allergenHead span {
+  /* Long names (Crustaceans) break rather than run into the next column. */
+  overflow-wrap: anywhere;
+  margin-top: 2px;
+  font-size: 6.5px;
+  font-weight: 500;
+  line-height: 1.1;
+  text-align: center;
+  color: var(--fg-3);
+}
+
+.formal .allergenHead span {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--neutral-900);
+}
+
+.formal .headIcon {
+  border: 1px solid var(--neutral-300);
+}
+
+.dishCell {
+  padding: 6px 8px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.cell {
+  padding: 5px 1px;
+  text-align: center;
+  font-size: 11px;
+}
+
+.formal .cell {
+  font-weight: 700;
+}
+
+.branded tbody tr:nth-child(even) > * {
+  background: var(--neutral-50);
+}
+
+.branded .present {
+  font-weight: 600;
+  color: var(--allergen-present);
+  background: var(--allergen-present-bg) !important;
+}
+
+.branded .may {
+  font-weight: 700;
+  color: var(--allergen-maycontain);
+  background: var(--allergen-maycontain-bg) !important;
+}
+
+/* A note prints in place of the mark; long notes get smaller. */
+.noteCell {
+  padding: 4px 2px;
+  font-size: 9px !important;
+  font-weight: 600;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+/* Size tiers by dish count (prototype): few dishes print large. */
+.formal.large .dishHead { padding: 16px 18px; font-size: 16px; }
+.formal.large .allergenHead span { font-size: 10.5px; }
+.formal.large .dishCell { padding: 16px 18px; font-size: 17px; }
+.formal.large .cell { padding: 18px 1px; font-size: 19px; }
+
+.formal.medium .dishHead { padding: 14px 16px; font-size: 14px; }
+.formal.medium .allergenHead span { font-size: 9px; }
+.formal.medium .dishCell { padding: 14px 16px; font-size: 15px; }
+.formal.medium .cell { padding: 14px 1px; font-size: 16px; }
+
+.formal.small .dishHead { padding: 8px 10px; font-size: 11px; }
+.formal.small .allergenHead span { font-size: 7.5px; }
+.formal.small .dishCell { padding: 7px 10px; font-size: 12px; }
+.formal.small .cell { padding: 7px 1px; font-size: 13px; }
+
+.formalLegend {
+  margin-top: auto;
+  padding-top: 4mm;
+  font-size: 9.5px;
+  text-align: center;
+  color: var(--fg-4);
+}
+
+.formalLegend .tagLegend {
+  margin-bottom: 4px;
+}
+
+.brandedLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 6mm;
+  padding-top: 4mm;
+  font-size: 9px;
+  color: var(--fg-4);
+  border-top: 1px solid var(--neutral-200);
+}
+
+.legendPresent {
+  color: var(--color-danger);
+}
+
+.legendMay {
+  color: var(--color-warning);
+}
+
+/* ── Menu ─────────────────────────────────────────────── */
+
+.menu {
+  padding: 16mm 14mm;
+}
+
+.menuBanner {
+  display: block;
+  width: calc(100% + 28mm);
+  height: auto;
+  margin: -16mm -14mm 8mm;
+}
+
+.menuHeader {
+  margin-bottom: 8mm;
+  padding-bottom: 8mm;
+  text-align: center;
+}
+
+.formal .menuHeader {
+  border-bottom: 1px solid var(--neutral-300);
+}
+
+.branded .menuHeader {
+  border-bottom: 2px solid var(--brand-forest);
+}
+
+.formal .menuTitle {
+  font-family: var(--font-playfair), serif;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.branded .menuTitle {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: var(--brand-forest);
+}
+
+.menuSection {
+  margin-bottom: 6mm;
+}
+
+.menuDivider {
+  margin-bottom: 8px;
+  font-size: 13px;
+  letter-spacing: 0.3em;
+  text-align: center;
+}
+
+.menuSectionTitle {
+  margin-bottom: 8px !important;
+  padding-bottom: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--brand-gold);
+  border-bottom: 1px solid var(--neutral-200);
+}
+
+.menuDish {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: baseline;
+  justify-content: center;
+  padding: 5px 0;
+  text-align: center;
+}
+
+.menuDishName {
+  font-size: 14px;
+}
+
+.formal .menuDishName {
+  font-weight: 700;
+}
+
+.menuTags {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--brand-forest);
+}
+
+.branded .menuTags {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.menuFooter {
+  margin-top: auto;
+  padding-top: 6mm;
+  text-align: center;
+}
+
+.menuFooter .tagLegend {
+  font-size: 11px;
+}
+
+.disclaimer {
+  position: relative;
+  height: 50mm;
+  margin: 6mm -14mm -16mm;
+}
+
+.disclaimerLeaf {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.disclaimer p {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20mm;
+  font-size: 9px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.menu .brandedLegend {
+  margin-top: auto;
+  font-size: 10px;
+  color: var(--fg-3);
+}
+
+/* ── Placecards: 2 × 7 labels of 9.9 × 3.81 cm ─────────── */
+
+.placecardPage {
+  padding: 0.5cm;
+}
+
+.placecards {
+  display: grid;
+  grid-template-columns: repeat(2, 9.9cm);
+  grid-template-rows: repeat(7, 3.81cm);
+  gap: 0.1cm 0.2cm;
+  justify-content: center;
+}
+
+.placecard,
+.blankCard {
+  border: 1px solid var(--neutral-300);
+  border-radius: 3px;
+}
+
+.placecard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12cm;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3cm 1cm;
+  overflow: hidden;
+  text-align: center;
+  font-size: 12px;
+}
+
+.blankCard {
+  border-style: dashed;
+  opacity: 0.35;
+}
+
+.cardName {
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: pre-line;
+}
+
+.cardTags {
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--brand-forest);
+}
+
+.cardContains {
+  line-height: 1.3;
+  color: var(--color-danger);
+}
+
+.cardMay {
+  line-height: 1.3;
+  color: var(--print-may-contain);
+}
+
+/* Additional message: centred box below the grid (prototype). */
+.sheetMessage {
+  margin-top: auto !important;
+  padding-top: 5mm;
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  text-align: center;
+}
+
+/* With a message, the legend follows it instead of sitting at the very bottom. */
+.sheetMessage + .formalLegend {
+  margin-top: 0;
+}
+
+/* Version stamp in the bottom-right corner of every page */
+.stamp {
+  position: absolute;
+  right: 6mm;
+  bottom: 3mm;
+  z-index: 1;
+  font-family: var(--font-mono);
+  font-size: 7px;
+  color: var(--fg-4);
+}
+
+@media print {
+  .page {
+    box-shadow: none;
+    break-after: page;
+  }
+
+  /*
+   * Browsers lay out a print job at one page width and shrink every page if any
+   * content is wider, so mixed portrait and landscape pages are unreliable.
+   * Instead the landscape sheet goes on a portrait page turned a quarter; on
+   * paper it is the same as a landscape print.
+   */
+  .landscape {
+    width: 210mm;
+    height: 297mm;
+    overflow: hidden;
+    /* Without full containment Chrome still counts the unrotated 297mm box and shrinks every page. */
+    contain: strict;
+  }
+
+  .landscape > .pageInner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 297mm;
+    height: 210mm;
+    transform: translateX(210mm) rotate(90deg);
+    transform-origin: top left;
+  }
+}

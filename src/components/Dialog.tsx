@@ -2,6 +2,9 @@
 
 import { useEffect, useId, useRef, type ReactNode } from "react";
 
+/** Backdrop clicks this soon after opening are ignored. */
+const BACKDROP_GRACE_MS = 500;
+
 type DialogProps = {
   open: boolean;
   /** Called on the close button, Esc, or a click on the backdrop. */
@@ -27,20 +30,26 @@ type DialogProps = {
  */
 export function Dialog({ open, onClose, title, eyebrow, subtitle, footer, size = "sm", children }: DialogProps) {
   const ref = useRef<HTMLDialogElement>(null);
+  const openedAt = useRef(0);
   const titleId = useId();
 
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
+    // Remembered so focus can go back to it even when the dialog is unmounted rather than closed.
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     if (open && !dialog.open) {
       dialog.showModal();
+      openedAt.current = performance.now();
       dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus();
     }
     if (!open && dialog.open) dialog.close();
     // Close when unmounted or hidden (Next keeps visited routes in a hidden <Activity>):
     // a modal left open off-screen would make the rest of the page inert.
     return () => {
-      if (dialog.open) dialog.close();
+      if (!dialog.open) return;
+      dialog.close();
+      if (opener?.isConnected) opener.focus();
     };
   }, [open]);
 
@@ -57,7 +66,8 @@ export function Dialog({ open, onClose, title, eyebrow, subtitle, footer, size =
       onClick={(event) => {
         // The panel's sections cover the whole box, so a click landing on
         // <dialog> itself can only be on the backdrop.
-        if (event.target === event.currentTarget) onClose();
+        // A double-click on the button that opened it would otherwise close it straight away.
+        if (event.target === event.currentTarget && performance.now() - openedAt.current > BACKDROP_GRACE_MS) onClose();
       }}
     >
       <div className="dialog-head">

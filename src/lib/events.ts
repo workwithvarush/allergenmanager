@@ -1,10 +1,13 @@
 import type { AllergenId } from "@/lib/allergens";
+import type { LogEntry } from "@/lib/changelog";
+import { formatDayShort } from "@/lib/dates";
 import type { VenueId } from "@/lib/venues";
 
 /** Allergen marking on a dish; absent allergens are simply left out. */
 export type AllergenMark = "present" | "may";
 
-export type DietaryTag = "v" | "vg" | "ncgi" | "df" | "halal";
+/** Dietary tags; which ones a venue uses is in dietary-tags.ts ("g" is Bramleys' "Contains Gluten"). */
+export type DietaryTag = "v" | "vg" | "ncgi" | "df" | "g" | "halal";
 
 export type Dish = {
   id: string;
@@ -13,6 +16,11 @@ export type Dish = {
   allergens: Partial<Record<AllergenId, AllergenMark>>;
   tags: DietaryTag[];
   mayContain: string;
+  /**
+   * One-line ingredient notes per allergen, e.g. gluten: "GF oats". A note prints in
+   * place of the ✕/M mark and appears in Contains on the placecard.
+   */
+  notes: Partial<Record<AllergenId, string>>;
   complete: boolean;
 };
 
@@ -23,6 +31,8 @@ export type AllergenEvent = {
   room: string;
   /** ISO date, e.g. "2026-05-20". */
   date: string;
+  /** Last day of an event running over several days; null for a single day. */
+  endDate: string | null;
   /** Service time, 24h "HH:mm". */
   time: string;
   guests: number;
@@ -38,6 +48,10 @@ export type AllergenEvent = {
   lastModifiedAt: string;
   /** Manually flagged for reprint after printing. */
   flagged: boolean;
+  /** Free text printed in a box below the allergen sheet, e.g. which kitchen section is nut-free. "" for none. */
+  customMessage: string;
+  /** Every change, oldest first: who, when and what (the change log). */
+  log: LogEntry[];
 };
 
 /** Dashboard lanes, as in the prototype's filter chips. */
@@ -65,7 +79,7 @@ export function isPendingReview(event: AllergenEvent): boolean {
 }
 
 /** Dishes with any allergen work on them — what a menu change would throw away. */
-export function dishesWithEntries(event: AllergenEvent): number {
+export function dishesWithEntries(event: Pick<AllergenEvent, "dishes">): number {
   return event.dishes.filter(
     (dish) => dish.complete || Object.keys(dish.allergens).length > 0 || dish.tags.length > 0 || dish.mayContain,
   ).length;
@@ -119,3 +133,41 @@ export function allergensFlagged(events: readonly AllergenEvent[]): number {
     0,
   );
 }
+
+/** True if the event runs on `isoDate` (multi-day events run on every day in their range). */
+export function eventOnDay(event: AllergenEvent, isoDate: string): boolean {
+  return isoDate >= event.date && isoDate <= (event.endDate ?? event.date);
+}
+
+/** "15 Oct", or "15 Oct – 16 Oct" for a multi-day event. */
+export function eventDateLabel(event: AllergenEvent): string {
+  const start = formatDayShort(event.date);
+  return event.endDate && event.endDate !== event.date ? `${start} – ${formatDayShort(event.endDate)}` : start;
+}
+
+/** "Menu A", or a custom menu's name. */
+export function menuLabel(event: AllergenEvent): string {
+  return event.menuId ? `Menu ${event.menuId}` : (event.menuName ?? `${event.dishes.length} dishes`);
+}
+
+export const MAX_DISH_NAME = 120;
+
+/** Ingredient notes are one line, e.g. "GF oats". */
+export const MAX_NOTE = 40;
+/** Longer notes still print, but shrink the printed matrix (prototype guidance). */
+export const SHORT_NOTE = 12;
+
+/**
+ * Why a dish can't be marked complete yet, or null if it can: it needs a name,
+ * and no ticked dietary tag may contradict its allergens (pass the conflicts in).
+ */
+export function completeBlockedReason(dish: Pick<Dish, "name">, tagConflicts: readonly string[]): string | null {
+  if (!dish.name.trim()) return "The dish needs a name before it can be marked complete.";
+  if (tagConflicts.length > 0) {
+    return `${tagConflicts.join(" and ")} ${tagConflicts.length === 1 ? "contradicts" : "contradict"} the allergens — the tag must be removed or an ingredient note added first.`;
+  }
+  return null;
+}
+
+/** The additional message is a short note, not a document. */
+export const MAX_MESSAGE = 300;

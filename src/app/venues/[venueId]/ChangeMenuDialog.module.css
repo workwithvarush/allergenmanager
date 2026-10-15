@@ -1,0 +1,62 @@
+/* Menu choice cards — like the New event form's "Starting menu" */
+
+.menus {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px;
+  background: var(--white);
+  border: 1px solid var(--neutral-300);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.menu:hover {
+  border-color: var(--neutral-400);
+}
+
+.menu:has(input:checked) {
+  background: var(--brand-forest-faint);
+  border-color: var(--brand-forest);
+  box-shadow: 0 0 0 3px var(--brand-forest-alpha-8);
+}
+
+.menu:has(input:focus-visible) {
+  outline: 2px solid var(--brand-forest);
+  outline-offset: 2px;
+}
+
+.menuName {
+  font-size: 14px;
+  font-weight: var(--fw-semibold);
+  color: var(--fg-1);
+}
+
+.menuMeta {
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-4);
+}
+
+.body {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--fg-3);
+}
+
+@media (max-width: 600px) {
+  .menus {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

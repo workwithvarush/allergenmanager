@@ -21,10 +21,12 @@ export default function VenueLayout({ children, params }: LayoutProps<"/venues/[
   return (
     <div className={styles.shell}>
       <div className={styles.frame}>
-        <Suspense fallback={<HeaderPlaceholder />}>
-          <VenueHeaderLoader params={params} />
-        </Suspense>
-        <div className={styles.offline}>
+        <div data-print-hide>
+          <Suspense fallback={<HeaderPlaceholder />}>
+            <VenueHeaderLoader params={params} />
+          </Suspense>
+        </div>
+        <div className={styles.offline} data-print-hide>
           <OfflineBanner />
         </div>
         <main className={styles.content}>{children}</main>

@@ -1,0 +1,122 @@
+/* New event form — values from the prototype */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+/* Starting menu: radio buttons drawn as cards */
+
+.menus {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.menusTitle {
+  padding: 0;
+  margin-bottom: 4px;
+  font-size: 13px;
+  font-weight: var(--fw-semibold);
+  color: var(--fg-2);
+}
+
+.menusHint {
+  margin: 0 0 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--fg-4);
+}
+
+.menuCards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.menuCard {
+  display: flex;
+  flex-direction: column;
+  min-height: 92px;
+  padding: 10px 12px;
+  background: var(--white);
+  border: 1px solid var(--neutral-300);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.menuCard:hover {
+  border-color: var(--neutral-400);
+}
+
+.menuCard:has(input:checked) {
+  background: var(--brand-forest-faint);
+  border-color: var(--brand-forest);
+  box-shadow: 0 0 0 3px var(--brand-forest-alpha-8);
+}
+
+.menuCard:has(input:focus-visible) {
+  outline: 2px solid var(--brand-forest);
+  outline-offset: 2px;
+}
+
+.menuName {
+  font-size: 14px;
+  font-weight: var(--fw-semibold);
+  color: var(--fg-1);
+}
+
+.menuMeta {
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-4);
+}
+
+.menuDishes {
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--fg-4);
+}
+
+/* Custom menu name and dish count */
+
+.custom {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--brand-forest-faint);
+  border: 1px solid var(--brand-forest-light);
+  border-radius: 8px;
+}
+
+.customNote {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--fg-3);
+}
+
+@media (max-width: 600px) {
+  .fields,
+  .menuCards,
+  .custom {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

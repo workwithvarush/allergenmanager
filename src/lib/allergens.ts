@@ -24,3 +24,8 @@ export type AllergenId = (typeof ALLERGENS)[number]["id"];
 export function allergenLabel(id: AllergenId): string {
   return ALLERGENS.find((a) => a.id === id)!.label;
 }
+
+/** True for one of the 14 allergen ids, e.g. checking a value sent from the browser. */
+export function isAllergenId(value: string): value is AllergenId {
+  return ALLERGENS.some((allergen) => allergen.id === value);
+}

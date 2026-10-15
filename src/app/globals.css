@@ -3,7 +3,8 @@
    <style> block in prototype/Allergen Manager.dc.html. */
 
 a { color: var(--brand-forest); }
-a:hover { color: var(--brand-forest-mid); }
+/* :where keeps this as weak as `a`, so links styled as buttons (.btn-*) keep their colours on hover. */
+a:where(:hover) { color: var(--brand-forest-mid); }
 
 button, input, select, textarea { font-family: inherit; }
 
@@ -14,6 +15,8 @@ input:focus, select:focus, textarea:focus {
 
 @media print {
   @page { size: A4 portrait; margin: 0; }
+  /* App chrome (header, tabs, buttons, editors) stays off paper. */
+  [data-print-hide] { display: none !important; }
   html, body { background: var(--white) !important; }
   * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }

@@ -24,3 +24,13 @@ export function canSeeAllVenues(role: Role): boolean {
 export function canSwitchVenue(role: Role): boolean {
   return role === "Supervisor" || role === "F&B Manager";
 }
+
+/** Everyone except Allergen Members can create events. */
+export function canCreateEvents(role: Role): boolean {
+  return role !== "Allergen Member";
+}
+
+/** Supervisors and F&B Managers can give an EMCC event a custom menu instead of a standard one. */
+export function canCreateCustomMenu(role: Role): boolean {
+  return role === "Supervisor" || role === "F&B Manager";
+}

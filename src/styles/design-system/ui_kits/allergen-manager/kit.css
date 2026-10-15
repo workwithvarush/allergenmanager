@@ -98,6 +98,16 @@ body {
 }
 .topnav-logout:hover { background: var(--brand-forest-faint); }
 
+/* Narrow screens: logo and user on the first row, the page tabs full width below,
+   so no tab is pushed off-screen. */
+@media (max-width: 760px) {
+  .topnav { flex-wrap: wrap; height: auto; padding: 10px 16px; gap: 10px; }
+  .topnav-right { display: contents; }
+  .topnav-tabs { order: 1; flex-basis: 100%; }
+  .topnav-tab { flex: 1; text-align: center; padding: 6px 8px; }
+  .topnav-user { margin-left: auto; }
+}
+
 /* ── Buttons ──────────────────────────────────────────── */
 .btn {
   display: inline-flex; align-items: center; gap: 6px;
