@@ -34,6 +34,7 @@ function Page({
   eventName,
   landscape = false,
   className,
+  style,
   ref,
   children,
 }: {
@@ -41,6 +42,8 @@ function Page({
   eventName: string;
   landscape?: boolean;
   className?: string;
+  /** On the content box, e.g. a size variable the document fits itself with. */
+  style?: CSSProperties;
   ref?: Ref<HTMLDivElement>;
   children: ReactNode;
 }) {
@@ -49,7 +52,7 @@ function Page({
     <section className={[styles.page, landscape ? styles.landscape : styles.portrait, playfair.variable].join(" ")}>
       {/* The page's content box: turned a quarter for printing when landscape (see the print CSS).
           data-fit: the preview warns if anything overflows it. */}
-      <div ref={ref} className={`${styles.pageInner} ${className ?? ""}`} data-fit>
+      <div ref={ref} className={`${styles.pageInner} ${className ?? ""}`} style={style} data-fit>
         {children}
         {/* The version stamp: lets counters check at a glance that a sheet is current. */}
         <p className={styles.stamp}>
@@ -223,6 +226,14 @@ export function AllergenSheet({ event }: DocumentProps) {
 }
 
 /**
+ * Menu text sizes, largest first, as multiples of the base sizes in the CSS
+ * (dish names 18px). A short menu prints large; a long one steps down until it
+ * fits one page, with EMCC's artwork shrinking too. 0.66 (dish names about
+ * 12px, 9pt) is the smallest before the menu continues on another page.
+ */
+const MENU_SCALES = [1.6, 1.45, 1.32, 1.2, 1.1, 1, 0.93, 0.86, 0.8, 0.74, 0.7, 0.66] as const;
+
+/**
  * The section of dishes on a menu built dish by dish (Bramleys). It isn't a
  * course, so the menu doesn't print it as a heading (the prototype did).
  */
@@ -232,23 +243,25 @@ const DISCLAIMER =
   'We can offer accurate information on ingredients, however, due to the open plan nature of our kitchens, we are unable to guarantee that dishes are "free from" allergens. If you have any dietary requirements, please check the allergen sheet on display or inform the staff.';
 
 /**
- * Guest menu: dish names by section with dietary tags, portrait A4. A long
- * menu continues on further pages, each with the legend and disclaimer, as
- * pages may be displayed apart (e.g. at different buffet stations).
+ * Guest menu: dish names by section with dietary tags, portrait A4. The text
+ * sizes itself so the whole menu fits on one page. Only a menu too long for
+ * that at the smallest size continues on further pages, each with the legend
+ * and disclaimer, as pages may be displayed apart (e.g. at buffet stations).
  */
 export function MenuDocument({ event }: DocumentProps) {
   const style = printStyle(event.venueId);
   const formal = style === "formal";
 
-  // Start on one page; while a page overflows, move its last dish to the next page.
+  // Fit the whole menu on one page: start at the largest size and step down while it overflows.
+  // Only below the smallest size does a page's last dish move to a further page.
   // Starts again whenever the dishes change.
   const fontsReady = useFontsReady();
   const contentKey = `${event.version}|${fontsReady}`;
-  const [breaks, setBreaks] = useState<number[]>([]);
+  const [fit, setFit] = useState<{ step: number; breaks: number[] }>({ step: 0, breaks: [] });
   const [fittedKey, setFittedKey] = useState(contentKey);
   if (fittedKey !== contentKey) {
     setFittedKey(contentKey);
-    setBreaks([]);
+    setFit({ step: 0, breaks: [] });
   }
   const pageRefs = useRef<(HTMLDivElement | null)[]>([]);
   const dishCount = event.dishes.length;
@@ -258,23 +271,25 @@ export function MenuDocument({ event }: DocumentProps) {
       // Pages in a hidden tab have no size; they're checked when the tab is shown.
       const p = pageRefs.current.findIndex((el) => el && el.clientHeight > 0 && el.scrollHeight > el.clientHeight + 1);
       if (p === -1) return;
-      setBreaks((current) => {
-        const start = current[p - 1] ?? 0;
-        const end = current[p] ?? dishCount;
+      setFit((current) => {
+        if (current.step < MENU_SCALES.length - 1) return { step: current.step + 1, breaks: [] };
+        const start = current.breaks[p - 1] ?? 0;
+        const end = current.breaks[p] ?? dishCount;
         // A single dish that doesn't fit stays put; the preview warns about it.
         if (end - start <= 1) return current;
-        const next = [...current];
-        next[p] = end - 1;
-        return next;
+        const breaks = [...current.breaks];
+        breaks[p] = end - 1;
+        return { ...current, breaks };
       });
     };
     check();
     const observer = new ResizeObserver(check);
     for (const el of pageRefs.current) if (el) observer.observe(el);
     return () => observer.disconnect();
-  }, [breaks, contentKey, dishCount]);
+  }, [fit, contentKey, dishCount]);
 
-  const pages = menuPages(event.dishes, breaks);
+  const pages = menuPages(event.dishes, fit.breaks);
+  const scale = { "--menu-scale": MENU_SCALES[fit.step] } as CSSProperties;
 
   return pages.map((sections, pageIndex) => (
     <Page
@@ -284,6 +299,7 @@ export function MenuDocument({ event }: DocumentProps) {
       }}
       eventName={event.name}
       className={`${styles.menu} ${styles[style]}`}
+      style={scale}
     >
       {formal && pageIndex === 0 && (
         <Image src={venuesHeader} alt="Nottingham Venues" className={styles.menuBanner} loading="eager" />
@@ -322,10 +338,13 @@ export function MenuDocument({ event }: DocumentProps) {
       ))}
       {formal ? (
         <footer className={styles.menuFooter}>
-          <p className={styles.tagLegend}>{tagLegend(event)}</p>
+          {/* The key sits inside the leaf band, directly above the disclaimer, so it stays with the footer. */}
           <div className={styles.disclaimer}>
             <Image src={menuFooterLeaf} alt="" className={styles.disclaimerLeaf} />
-            <p>{DISCLAIMER}</p>
+            <div className={styles.disclaimerText}>
+              <p className={styles.tagLegend}>{tagLegend(event)}</p>
+              <p>{DISCLAIMER}</p>
+            </div>
           </div>
         </footer>
       ) : (
@@ -363,8 +382,9 @@ export function Placecards({ event }: DocumentProps) {
 }
 
 /**
- * Label text sizes, largest first (12px from the prototype). A label whose text
- * doesn't fit steps down; 10px (7.5pt) is the smallest kept readable at arm's length.
+ * Label text sizes. Every label prints at the standard 12px, as in the prototype;
+ * only a label whose text wouldn't fit steps down, so nothing is cut off. 10px
+ * (7.5pt) is the smallest kept readable at arm's length; below that the preview warns.
  */
 const CARD_FONT_SIZES = [12, 11, 10] as const;
 
@@ -385,7 +405,9 @@ function Placecard({ dish, showTags, fontsReady }: { dish: Dish; showTags: boole
     const el = ref.current;
     const check = () => {
       // Labels in a hidden tab have no size; they're checked when the tab is shown.
-      if (!el || el.clientHeight === 0 || el.scrollHeight <= el.clientHeight + 1) return;
+      if (!el || el.clientHeight === 0) return;
+      // Too tall, or a long word too wide for the label at this size.
+      if (el.scrollHeight <= el.clientHeight + 1 && el.scrollWidth <= el.clientWidth + 1) return;
       setStep((s) => Math.min(s + 1, CARD_FONT_SIZES.length - 1));
     };
     check();

@@ -274,18 +274,23 @@
 
 .menu {
   padding: 16mm 14mm;
+  /* The banner and leaf band shrink with long menus (never below 60%) to leave room for dishes. */
+  --menu-art: clamp(0.6, var(--menu-scale, 1), 1);
 }
 
+/* 70mm tall at full size; when smaller, the decorative top is cropped and the logo kept. */
 .menuBanner {
   display: block;
   width: calc(100% + 28mm);
-  height: auto;
-  margin: -16mm -14mm 8mm;
+  height: calc(70mm * var(--menu-art));
+  margin: -16mm -14mm calc(8mm * var(--menu-art));
+  object-fit: cover;
+  object-position: center bottom;
 }
 
 .menuHeader {
-  margin-bottom: 8mm;
-  padding-bottom: 8mm;
+  margin-bottom: calc(8mm * var(--menu-scale, 1));
+  padding-bottom: calc(8mm * var(--menu-scale, 1));
   text-align: center;
 }
 
@@ -297,35 +302,41 @@
   border-bottom: 2px solid var(--brand-forest);
 }
 
+/*
+ * Menu text and spacing are base sizes times --menu-scale, which the menu sets so
+ * that it fits one page: larger for a short menu, smaller for a long one (see
+ * MENU_SCALES). At 1, dish names are 18px; the prototype's 14px read small on A4.
+ * The footer (key and disclaimer) keeps a fixed size.
+ */
 .formal .menuTitle {
   font-family: var(--font-playfair), serif;
-  font-size: 26px;
+  font-size: calc(32px * var(--menu-scale, 1));
   font-weight: 700;
   letter-spacing: 0.05em;
 }
 
 .branded .menuTitle {
-  font-size: 20px;
+  font-size: calc(24px * var(--menu-scale, 1));
   font-weight: 600;
   letter-spacing: -0.2px;
   color: var(--brand-forest);
 }
 
 .menuSection {
-  margin-bottom: 6mm;
+  margin-bottom: calc(6mm * var(--menu-scale, 1));
 }
 
 .menuDivider {
-  margin-bottom: 8px;
-  font-size: 13px;
+  margin-bottom: calc(10px * var(--menu-scale, 1));
+  font-size: calc(15px * var(--menu-scale, 1));
   letter-spacing: 0.3em;
   text-align: center;
 }
 
 .menuSectionTitle {
-  margin-bottom: 8px !important;
-  padding-bottom: 6px;
-  font-size: 11px;
+  margin-bottom: calc(10px * var(--menu-scale, 1)) !important;
+  padding-bottom: calc(6px * var(--menu-scale, 1));
+  font-size: calc(13px * var(--menu-scale, 1));
   font-weight: 600;
   letter-spacing: 0.08em;
   text-align: center;
@@ -337,15 +348,16 @@
 .menuDish {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: calc(6px * var(--menu-scale, 1));
   align-items: baseline;
   justify-content: center;
-  padding: 5px 0;
+  padding: calc(6px * var(--menu-scale, 1)) 0;
   text-align: center;
 }
 
 .menuDishName {
-  font-size: 14px;
+  font-size: calc(18px * var(--menu-scale, 1));
+  line-height: 1.35;
 }
 
 .formal .menuDishName {
@@ -353,17 +365,18 @@
 }
 
 .menuTags {
-  font-size: 12px;
+  font-size: calc(15px * var(--menu-scale, 1));
   font-weight: 700;
   color: var(--brand-forest);
 }
 
 .branded .menuTags {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: calc(13px * var(--menu-scale, 1));
   font-weight: 600;
 }
 
+/* Pinned to the bottom of every page: the leaf band holding the dietary key and the disclaimer (EMCC). */
 .menuFooter {
   margin-top: auto;
   padding-top: 6mm;
@@ -371,13 +384,13 @@
 }
 
 .menuFooter .tagLegend {
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .disclaimer {
   position: relative;
-  height: 50mm;
-  margin: 6mm -14mm -16mm;
+  height: calc(50mm * var(--menu-art, 1));
+  margin: 0 -14mm -16mm;
 }
 
 .disclaimerLeaf {
@@ -385,24 +398,33 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center bottom;
 }
 
-.disclaimer p {
+/* Key above disclaimer, centred together in the band. */
+.disclaimerText {
   position: absolute;
   inset: 0;
   display: flex;
+  flex-direction: column;
+  gap: 3mm;
   align-items: center;
   justify-content: center;
-  padding: 0 20mm;
-  font-size: 9px;
-  line-height: 1.5;
+  padding: 0 18mm;
   text-align: center;
+  /* Keeps the text crisp where the leaf artwork runs behind it. */
+  text-shadow: 0 0 2px var(--white), 0 0 4px var(--white);
+}
+
+.disclaimerText p:last-child {
+  font-size: 10.5px;
+  line-height: 1.5;
 }
 
 .menu .brandedLegend {
   margin-top: auto;
   padding-top: 6mm;
-  font-size: 10px;
+  font-size: 12px;
   color: var(--fg-3);
 }
 
@@ -435,13 +457,15 @@
 .placecard {
   display: flex;
   flex-direction: column;
-  gap: 0.12cm;
+  /* Spacing grows and shrinks with the text. */
+  gap: 0.3em;
   align-items: center;
-  justify-content: center;
-  padding: 0.3cm 1cm;
+  /* "safe": text that overflows spills at the bottom, where it is measured, not off the top. */
+  justify-content: safe center;
+  padding: 0.3cm 0.8cm;
   overflow: hidden;
   text-align: center;
-  /* Set per label: smaller steps when the text wouldn't otherwise fit. */
+  /* Set per label: the standard 12px, or a step smaller if its text wouldn't fit (CARD_FONT_SIZES). */
   font-size: var(--card-font, 12px);
 }
 
