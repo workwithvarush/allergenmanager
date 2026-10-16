@@ -2,7 +2,7 @@
 
 import { Playfair_Display } from "next/font/google";
 import Image from "next/image";
-import { useLayoutEffect, useRef, useState, type ReactNode, type Ref } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type Ref } from "react";
 import allergenLeaf from "@/assets/print/allergen-leaf.png";
 import menuFooterLeaf from "@/assets/print/menu-footer-leaf.png";
 import venuesHeader from "@/assets/print/nottingham-venues-header.png";
@@ -11,10 +11,9 @@ import { ALLERGENS } from "@/lib/allergens";
 import { DIETARY_TAGS, venueTags } from "@/lib/dietary-tags";
 import type { AllergenEvent, Dish } from "@/lib/events";
 import {
-  balancedBreak,
   containsText,
   mayContainText,
-  menuSections,
+  menuPages,
   paginate,
   PLACECARDS_PER_PAGE,
   printStyle,
@@ -61,6 +60,24 @@ function Page({
   );
 }
 
+/**
+ * False until the web fonts have loaded. Text measured in a fallback font
+ * wraps differently, so documents fit themselves again once this turns true.
+ */
+function useFontsReady(): boolean {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    let live = true;
+    document.fonts.ready.then(() => {
+      if (live) setReady(true);
+    });
+    return () => {
+      live = false;
+    };
+  }, []);
+  return ready;
+}
+
 /** "(V) = Vegetarian   (VG) = Vegan …" for the venue's tags. */
 function tagLegend(event: AllergenEvent): string {
   return venueTags(event.venueId)
@@ -68,8 +85,11 @@ function tagLegend(event: AllergenEvent): string {
     .join("   ");
 }
 
-/** Icon size in the formal sheet header, by size tier (prototype). */
-const ICON_SIZE = { large: 52, medium: 42, small: 32 } as const;
+/** Icon size in the sheet header, by style and size tier (formal from the prototype). */
+const ICON_SIZE = {
+  formal: { large: 52, medium: 42, small: 32 },
+  branded: { large: 26, medium: 20, small: 14 },
+} as const;
 
 const MARK: Record<"present" | "may", { formal: string; branded: string }> = {
   present: { formal: "X", branded: "✕" },
@@ -91,7 +111,8 @@ export function AllergenSheet({ event }: DocumentProps) {
     const tierIndex = sheetTierIndex(event.dishes.length);
     return { tierIndex, rowsPerPage: SHEET_TIERS[tierIndex].rowsPerPage as number };
   };
-  const contentKey = `${event.version}|${message}`;
+  const fontsReady = useFontsReady();
+  const contentKey = `${event.version}|${message}|${fontsReady}`;
   const [fit, setFit] = useState(initial);
   const [fittedKey, setFittedKey] = useState(contentKey);
   if (fittedKey !== contentKey) {
@@ -149,7 +170,7 @@ export function AllergenSheet({ event }: DocumentProps) {
             </th>
             {ALLERGENS.map((a) => (
               <th key={a.id} scope="col" className={styles.allergenHead}>
-                <AllergenIcon allergen={a.id} size={formal ? ICON_SIZE[tier] : 14} alt="" className={styles.headIcon} />
+                <AllergenIcon allergen={a.id} size={ICON_SIZE[style][tier]} alt="" className={styles.headIcon} />
                 <span>{a.label}</span>
               </th>
             ))}
@@ -201,20 +222,79 @@ export function AllergenSheet({ event }: DocumentProps) {
   ));
 }
 
+/**
+ * The section of dishes on a menu built dish by dish (Bramleys). It isn't a
+ * course, so the menu doesn't print it as a heading (the prototype did).
+ */
+const UNSECTIONED = "Dish";
+
 const DISCLAIMER =
   'We can offer accurate information on ingredients, however, due to the open plan nature of our kitchens, we are unable to guarantee that dishes are "free from" allergens. If you have any dietary requirements, please check the allergen sheet on display or inform the staff.';
 
-/** Guest menu: dish names by section with dietary tags, portrait A4. */
+/**
+ * Guest menu: dish names by section with dietary tags, portrait A4. A long
+ * menu continues on further pages, each with the legend and disclaimer, as
+ * pages may be displayed apart (e.g. at different buffet stations).
+ */
 export function MenuDocument({ event }: DocumentProps) {
   const style = printStyle(event.venueId);
   const formal = style === "formal";
-  const sections = menuSections(event.dishes);
 
-  return (
-    <Page eventName={event.name} className={`${styles.menu} ${styles[style]}`}>
-      {formal && <Image src={venuesHeader} alt="Nottingham Venues" className={styles.menuBanner} loading="eager" />}
+  // Start on one page; while a page overflows, move its last dish to the next page.
+  // Starts again whenever the dishes change.
+  const fontsReady = useFontsReady();
+  const contentKey = `${event.version}|${fontsReady}`;
+  const [breaks, setBreaks] = useState<number[]>([]);
+  const [fittedKey, setFittedKey] = useState(contentKey);
+  if (fittedKey !== contentKey) {
+    setFittedKey(contentKey);
+    setBreaks([]);
+  }
+  const pageRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const dishCount = event.dishes.length;
+
+  useLayoutEffect(() => {
+    const check = () => {
+      // Pages in a hidden tab have no size; they're checked when the tab is shown.
+      const p = pageRefs.current.findIndex((el) => el && el.clientHeight > 0 && el.scrollHeight > el.clientHeight + 1);
+      if (p === -1) return;
+      setBreaks((current) => {
+        const start = current[p - 1] ?? 0;
+        const end = current[p] ?? dishCount;
+        // A single dish that doesn't fit stays put; the preview warns about it.
+        if (end - start <= 1) return current;
+        const next = [...current];
+        next[p] = end - 1;
+        return next;
+      });
+    };
+    check();
+    const observer = new ResizeObserver(check);
+    for (const el of pageRefs.current) if (el) observer.observe(el);
+    return () => observer.disconnect();
+  }, [breaks, contentKey, dishCount]);
+
+  const pages = menuPages(event.dishes, breaks);
+
+  return pages.map((sections, pageIndex) => (
+    <Page
+      key={pageIndex}
+      ref={(el) => {
+        pageRefs.current[pageIndex] = el;
+      }}
+      eventName={event.name}
+      className={`${styles.menu} ${styles[style]}`}
+    >
+      {formal && pageIndex === 0 && (
+        <Image src={venuesHeader} alt="Nottingham Venues" className={styles.menuBanner} loading="eager" />
+      )}
       <header className={styles.menuHeader}>
         <h2 className={styles.menuTitle}>{formal ? "MENU" : "Nottingham Venues"}</h2>
+        {pages.length > 1 && (
+          <p className={styles.pageNumber}>
+            Page {pageIndex + 1} of {pages.length}
+          </p>
+        )}
       </header>
       {sections.map((section, i) => (
         <div key={section.title} className={styles.menuSection}>
@@ -225,7 +305,12 @@ export function MenuDocument({ event }: DocumentProps) {
               </div>
             )
           ) : (
-            <h3 className={styles.menuSectionTitle}>{section.title}</h3>
+            section.title !== UNSECTIONED && (
+              <h3 className={styles.menuSectionTitle}>
+                {section.title}
+                {section.continued && " (continued)"}
+              </h3>
+            )
           )}
           {section.dishes.map((dish) => (
             <p key={dish.id} className={styles.menuDish}>
@@ -253,19 +338,20 @@ export function MenuDocument({ event }: DocumentProps) {
         </footer>
       )}
     </Page>
-  );
+  ));
 }
 
 /** One label per dish: name, tags (formal only), Contains and May contain. 14 labels per A4 sheet. */
 export function Placecards({ event }: DocumentProps) {
   const formal = printStyle(event.venueId) === "formal";
+  const fontsReady = useFontsReady();
   const pages = paginate(event.dishes, PLACECARDS_PER_PAGE);
 
   return pages.map((dishes, pageIndex) => (
     <Page key={pageIndex} eventName={event.name} className={styles.placecardPage}>
       <div className={styles.placecards}>
         {dishes.map((dish) => (
-          <Placecard key={dish.id} dish={dish} showTags={formal} />
+          <Placecard key={dish.id} dish={dish} showTags={formal} fontsReady={fontsReady} />
         ))}
         {/* Unused labels on the sheet, drawn faintly so the layout matches the label stock. */}
         {Array.from({ length: PLACECARDS_PER_PAGE - dishes.length }, (_, i) => (
@@ -276,13 +362,47 @@ export function Placecards({ event }: DocumentProps) {
   ));
 }
 
-function Placecard({ dish, showTags }: { dish: Dish; showTags: boolean }) {
+/**
+ * Label text sizes, largest first (12px from the prototype). A label whose text
+ * doesn't fit steps down; 10px (7.5pt) is the smallest kept readable at arm's length.
+ */
+const CARD_FONT_SIZES = [12, 11, 10] as const;
+
+function Placecard({ dish, showTags, fontsReady }: { dish: Dish; showTags: boolean; fontsReady: boolean }) {
   const contains = containsText(dish);
   const may = mayContainText(dish);
+
+  // Start at full size whenever the text changes; step down while it overflows.
+  const contentKey = `${dish.name}|${showTags ? tagsText(dish.tags) : ""}|${contains}|${may}|${fontsReady}`;
+  const [step, setStep] = useState(0);
+  const [fittedKey, setFittedKey] = useState(contentKey);
+  if (fittedKey !== contentKey) {
+    setFittedKey(contentKey);
+    setStep(0);
+  }
+  const ref = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    const check = () => {
+      // Labels in a hidden tab have no size; they're checked when the tab is shown.
+      if (!el || el.clientHeight === 0 || el.scrollHeight <= el.clientHeight + 1) return;
+      setStep((s) => Math.min(s + 1, CARD_FONT_SIZES.length - 1));
+    };
+    check();
+    const observer = new ResizeObserver(check);
+    if (el) observer.observe(el);
+    return () => observer.disconnect();
+  }, [step, contentKey]);
+
   return (
-    // data-fit: the preview warns if a label's text doesn't fit and would be cut off.
-    <div className={styles.placecard} data-fit>
-      <p className={styles.cardName}>{balancedBreak(dish.name)}</p>
+    // data-fit: the preview warns if a label's text still doesn't fit at the smallest size.
+    <div
+      ref={ref}
+      className={styles.placecard}
+      style={{ "--card-font": `${CARD_FONT_SIZES[step]}px` } as CSSProperties}
+      data-fit
+    >
+      <p className={styles.cardName}>{dish.name}</p>
       {showTags && dish.tags.length > 0 && <p className={styles.cardTags}>{tagsText(dish.tags)}</p>}
       {contains && (
         <p className={styles.cardContains}>

@@ -63,26 +63,31 @@ export function menuSections(dishes: readonly Dish[]): { title: string; dishes: 
   return [...sections].map(([title, list]) => ({ title, dishes: list })).sort((a, b) => rank(a.title) - rank(b.title));
 }
 
+export type MenuPageSection = {
+  title: string;
+  dishes: Dish[];
+  /** The section began on an earlier page. */
+  continued: boolean;
+};
+
 /**
- * Splits a long dish name over two lines of similar length for placecards
- * (prototype). Names of 26 characters or fewer stay on one line.
+ * The menu's sections split into pages. `breaks` holds the position (in menu
+ * order, across sections) of the first dish on each page after the first.
  */
-export function balancedBreak(name: string): string {
-  if (name.length <= 26) return name;
-  const words = name.split(" ");
-  let best = -1;
-  let bestDiff = Infinity;
-  let line = "";
-  for (let i = 0; i < words.length - 1; i++) {
-    line += (i ? " " : "") + words[i];
-    const diff = Math.abs(line.length - (name.length - line.length - 1));
-    if (diff < bestDiff) {
-      bestDiff = diff;
-      best = i;
+export function menuPages(dishes: readonly Dish[], breaks: readonly number[]): MenuPageSection[][] {
+  const ordered = menuSections(dishes).flatMap((section) =>
+    section.dishes.map((dish, i) => ({ title: section.title, dish, first: i === 0 })),
+  );
+  const starts = [0, ...breaks];
+  return starts.map((start, p) => {
+    const sections: MenuPageSection[] = [];
+    for (const item of ordered.slice(start, starts[p + 1] ?? ordered.length)) {
+      const last = sections[sections.length - 1];
+      if (last?.title === item.title) last.dishes.push(item.dish);
+      else sections.push({ title: item.title, dishes: [item.dish], continued: !item.first });
     }
-  }
-  if (best < 0) return name;
-  return `${words.slice(0, best + 1).join(" ")}\n${words.slice(best + 1).join(" ")}`;
+    return sections;
+  });
 }
 
 /** Splits items into pages of `size`. Always at least one (possibly empty) page. */
@@ -92,7 +97,7 @@ export function paginate<T>(items: readonly T[], size: number): T[][] {
   return pages.length > 0 ? pages : [[]];
 }
 
-/** Placecards per A4 sheet: 2 × 7 labels of 9.9 × 3.81 cm. */
+/** Placecards per A4 sheet: 2 × 7 labels of 99.1 × 38.1 mm (standard 14-per-sheet label stock). */
 export const PLACECARDS_PER_PAGE = 14;
 
 /**

@@ -225,6 +225,20 @@
 .formal.small .dishCell { padding: 7px 10px; font-size: 12px; }
 .formal.small .cell { padding: 7px 1px; font-size: 13px; }
 
+/* The branded sheet grows the same way, so a short menu is easy to read at the counter
+   (the prototype printed it at the small size whatever the dish count). */
+.branded.large .dishHead { padding: 10px 14px; font-size: 14px; }
+.branded.large .allergenHead span { font-size: 9.5px; }
+.branded.large .dishCell { padding: 16px 14px; font-size: 16px; }
+.branded.large .cell { padding: 16px 1px; font-size: 20px; }
+.branded.large .brandedLegend { font-size: 11px; }
+
+.branded.medium .dishHead { padding: 8px 12px; font-size: 12px; }
+.branded.medium .allergenHead span { font-size: 8px; }
+.branded.medium .dishCell { padding: 12px 12px; font-size: 14px; }
+.branded.medium .cell { padding: 12px 1px; font-size: 17px; }
+.branded.medium .brandedLegend { font-size: 10px; }
+
 .formalLegend {
   margin-top: auto;
   padding-top: 4mm;
@@ -387,24 +401,31 @@
 
 .menu .brandedLegend {
   margin-top: auto;
+  padding-top: 6mm;
   font-size: 10px;
   color: var(--fg-3);
 }
 
-/* ── Placecards: 2 × 7 labels of 9.9 × 3.81 cm ─────────── */
+/*
+ * ── Placecards: 2 × 7 labels of 99.1 × 38.1 mm ─────────
+ * Positioned for standard 14-per-sheet A4 label stock (Avery L7163 / J8163 and
+ * equivalents): 15.15 mm top and bottom margins, 4.65 mm side margins, 2.5 mm
+ * between the columns, rows touching. The prototype's grid (5 mm top margin,
+ * 1 mm between rows) drifted off the labels row by row.
+ */
 
 .placecardPage {
-  padding: 0.5cm;
+  padding: 15.15mm 4.65mm 0;
 }
 
 .placecards {
   display: grid;
-  grid-template-columns: repeat(2, 9.9cm);
-  grid-template-rows: repeat(7, 3.81cm);
-  gap: 0.1cm 0.2cm;
-  justify-content: center;
+  grid-template-columns: repeat(2, 99.1mm);
+  grid-template-rows: repeat(7, 38.1mm);
+  column-gap: 2.5mm;
 }
 
+/* Label outlines are a guide on screen; on paper the label edges are the stock's own. */
 .placecard,
 .blankCard {
   border: 1px solid var(--neutral-300);
@@ -420,7 +441,8 @@
   padding: 0.3cm 1cm;
   overflow: hidden;
   text-align: center;
-  font-size: 12px;
+  /* Set per label: smaller steps when the text wouldn't otherwise fit. */
+  font-size: var(--card-font, 12px);
 }
 
 .blankCard {
@@ -428,10 +450,11 @@
   opacity: 0.35;
 }
 
+/* Lines of even length, however many the name needs (the prototype split names over 26 characters in two by hand). */
 .cardName {
   font-weight: 600;
   line-height: 1.2;
-  white-space: pre-line;
+  text-wrap: balance;
 }
 
 .cardTags {
@@ -480,6 +503,14 @@
   .page {
     box-shadow: none;
     break-after: page;
+  }
+
+  .placecard {
+    border-color: transparent;
+  }
+
+  .blankCard {
+    visibility: hidden;
   }
 
   /*
