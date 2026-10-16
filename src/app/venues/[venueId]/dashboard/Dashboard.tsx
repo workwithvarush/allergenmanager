@@ -11,7 +11,7 @@ import type { Role } from "@/lib/roles";
 import { useVenueClock } from "@/lib/useVenueClock";
 import { formatDayLong } from "@/lib/venue-time";
 import { usesStandardMenus, type VenueId } from "@/lib/venues";
-import { changeMenu as saveMenuChange } from "../events/[eventId]/actions";
+import { changeMenu as saveMenuChange, setReprintFlag } from "../events/[eventId]/actions";
 import { NewEventDialog } from "../NewEventDialog";
 import { DashboardStats } from "./DashboardStats";
 import { EventDetail, EventDetailEmpty } from "./EventDetail";
@@ -33,8 +33,8 @@ type DashboardProps = {
 };
 
 /**
- * Today's events beside the selected event's details. Edits (menu change,
- * reprint flag) are held in the browser until there is a backend to save them.
+ * Today's events beside the selected event's details. Menu changes and the
+ * reprint flag are saved on the server and logged.
  */
 export function Dashboard({ venueId, role, today, initialEvents, otherVenueEvents, menus }: DashboardProps) {
   const now = useVenueClock();
@@ -42,11 +42,12 @@ export function Dashboard({ venueId, role, today, initialEvents, otherVenueEvent
   const [filter, setFilter] = useState<Filter>("all");
   const [selectedId, setSelectedId] = useState<string | null>(initialEvents[0]?.id ?? null);
   const [creating, setCreating] = useState(false);
-  const [menuError, setMenuError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [created, setCreated] = useState<{ name: string; date: string } | null>(null);
 
   // The server sends a fresh list after an event is created or edited elsewhere (e.g. allergen entry).
-  // Take new events and newer versions, keeping this page's unsaved edits to the rest.
+  // Take new events and the server's copy of the rest, unless this page already has a newer version.
+  // Same version counts too: the reprint flag and printing change an event without a new version.
   const [prevInitialEvents, setPrevInitialEvents] = useState(initialEvents);
   if (initialEvents !== prevInitialEvents) {
     setPrevInitialEvents(initialEvents);
@@ -54,7 +55,7 @@ export function Dashboard({ venueId, role, today, initialEvents, otherVenueEvent
       sortByServiceTime([
         ...current.map((c) => {
           const incoming = initialEvents.find((e) => e.id === c.id);
-          return incoming && incoming.version > c.version ? incoming : c;
+          return incoming && incoming.version >= c.version ? incoming : c;
         }),
         ...initialEvents.filter((e) => !current.some((c) => c.id === e.id)),
       ]),
@@ -91,20 +92,37 @@ export function Dashboard({ venueId, role, today, initialEvents, otherVenueEvent
   const changeMenu = async (menu: StandardMenu) => {
     if (!selected) return;
     const id = selected.id;
-    setMenuError(null);
+    setActionError(null);
     const result = await saveMenuChange(venueId, id, menu.id).catch(() => ({
       ok: false as const,
       message: "the server could not be reached.",
     }));
     if (!result.ok) {
-      setMenuError(`Menu not changed — ${result.message.charAt(0).toLowerCase()}${result.message.slice(1)}`);
+      setActionError(`Menu not changed — ${result.message.charAt(0).toLowerCase()}${result.message.slice(1)}`);
       return;
     }
     const { menuId, menuName, dishes, version, lastModifiedAt } = result;
     updateEvent(id, (event) => ({ ...event, menuId, menuName, dishes, version, lastModifiedAt }));
   };
 
-  const toggleFlag = () => selected && updateEvent(selected.id, (event) => ({ ...event, flagged: !event.flagged }));
+  /** Shows the flag change straight away, saves it, and undoes it if the save fails. */
+  const toggleFlag = async () => {
+    if (!selected) return;
+    const id = selected.id;
+    const flagged = !selected.flagged;
+    setActionError(null);
+    updateEvent(id, (event) => ({ ...event, flagged }));
+    const result = await setReprintFlag(venueId, id, flagged).catch(() => ({
+      ok: false as const,
+      message: "the server could not be reached.",
+    }));
+    if (!result.ok) {
+      updateEvent(id, (event) => ({ ...event, flagged: !flagged }));
+      setActionError(
+        `Reprint flag not ${flagged ? "set" : "cleared"} — ${result.message.charAt(0).toLowerCase()}${result.message.slice(1)}`,
+      );
+    }
+  };
 
   const printed = events.filter(isPrintedCurrent).length;
 
@@ -135,9 +153,9 @@ export function Dashboard({ venueId, role, today, initialEvents, otherVenueEvent
         </div>
       </div>
       <div role="alert">
-        {menuError && (
+        {actionError && (
           <div className={`banner banner-danger ${styles.created}`}>
-            <div className="banner-body">{menuError}</div>
+            <div className="banner-body">{actionError}</div>
           </div>
         )}
       </div>

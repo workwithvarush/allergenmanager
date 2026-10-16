@@ -16,6 +16,7 @@ import {
   type Dish,
 } from "@/lib/events";
 import { activeMenus, instantiateMenu } from "@/lib/menus";
+import { canFlagForReprint } from "@/lib/permissions";
 import { MAX_DISHES } from "@/lib/new-event";
 import { getSessionUser } from "@/lib/session";
 import { venueTime } from "@/lib/venue-time";
@@ -285,6 +286,36 @@ export async function setMessage(venueId: string, eventId: string, text: string)
 }
 
 export type PrintResult = { ok: true; printedAt: string; version: number } | { ok: false; message: string };
+
+export type FlagResult = { ok: true } | { ok: false; message: string };
+
+/**
+ * Flags a printed event for reprint, or clears the flag, with a change log
+ * entry. The documents don't change, so neither does the version.
+ */
+export async function setReprintFlag(venueId: string, eventId: string, flagged: boolean): Promise<FlagResult> {
+  const user = await getSessionUser();
+  if (!canFlagForReprint(user.role)) return { ok: false, message: "Allergen Members can't flag events for reprint." };
+  const actor: LogActor = { name: user.name, role: user.role, email: user.email };
+  const venue = VENUES.find((v) => v.id === venueId && v.available);
+  const event = venue && (await getEvent(venue.id, eventId));
+  if (!event) return { ok: false, message: "This event no longer exists." };
+  if (!event.lastPrintedAt) return { ok: false, message: "This event hasn't been printed, so there is nothing to reprint." };
+  if (event.flagged === flagged) return { ok: true };
+  await saveEvent({
+    ...event,
+    flagged,
+    log: [
+      ...event.log,
+      // Flagging puts the event in the post-print alerts (amber); clearing it is routine.
+      flagged
+        ? makeLogEntry(actor, "warn", "Flagged for reprint")
+        : makeLogEntry(actor, "edit", "Reprint flag cleared"),
+    ],
+  });
+  refresh();
+  return { ok: true };
+}
 
 /**
  * Records that all 3 documents were printed at `version`. Printing doesn't change
